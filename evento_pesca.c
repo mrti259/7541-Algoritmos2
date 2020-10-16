@@ -8,6 +8,7 @@
 #define FORMATO_ESCRITURA_ACUARIO "%s;%i;%i;%s\n"
 #define ERROR_APERTURA -1
 #define ERROR_MODIFICANDO -1
+#define ERROR_TRASLADANDO -1
 #define SIN_ERROR 0
 #define SIN_POKEMON 0
 
@@ -197,7 +198,7 @@ int mover_pokemon(arrecife_t* arrecife, acuario_t* acuario, int cant_seleccion, 
         }
         i--;
     }
-    return cant_seleccion - i;
+    return funciono ? cant_seleccion : cant_seleccion - i;
 }
 
 /*
@@ -246,9 +247,8 @@ int trasladar_pokemon(arrecife_t* arrecife, acuario_t* acuario, bool (*seleccion
             movidos = mover_pokemon(arrecife, acuario, cant_seleccion, v_pokemon);
          }
         free((void*) v_pokemon);
-        return SIN_ERROR;
     }
-    return !v_pokemon  || !(movidos == cant_seleccion);
+    return movidos == cant_seleccion ? SIN_ERROR : ERROR_TRASLADANDO;
 }
 
 void censar_arrecife(arrecife_t* arrecife, void (*mostrar_pokemon)(pokemon_t*)) {

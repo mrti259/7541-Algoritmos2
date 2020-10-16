@@ -9,6 +9,7 @@
 #define ERROR_APERTURA -1
 #define ERROR_MODIFICANDO -1
 #define ERROR_TRASLADANDO -1
+#define ERROR_GUARDANDO -1
 #define SIN_ERROR 0
 #define SIN_POKEMON 0
 
@@ -206,7 +207,7 @@ int mover_pokemon(arrecife_t* arrecife, acuario_t* acuario, int cant_seleccion, 
  */
 void liberar_pokemon(pokemon_t* pokemon) {
     if (!pokemon) return;
-    free((void*) pokemon);
+    free(pokemon);
 }
 
 /*
@@ -246,7 +247,7 @@ int trasladar_pokemon(arrecife_t* arrecife, acuario_t* acuario, bool (*seleccion
         if (encontrados == cant_seleccion) {
             movidos = mover_pokemon(arrecife, acuario, cant_seleccion, v_pokemon);
          }
-        free((void*) v_pokemon);
+        free(v_pokemon);
     }
     return movidos == cant_seleccion ? SIN_ERROR : ERROR_TRASLADANDO;
 }
@@ -258,6 +259,9 @@ void censar_arrecife(arrecife_t* arrecife, void (*mostrar_pokemon)(pokemon_t*)) 
 }
 
 int guardar_datos_acuario(acuario_t* acuario, const char* nombre_archivo) {
+    if (!(acuario && acuario->pokemon && acuario->cantidad_pokemon))
+        return ERROR_GUARDANDO;
+    
     FILE *info_acuario = fopen(nombre_archivo, ESCRITURA);
     if (info_acuario) {
         escribir_pokemon(acuario->pokemon, acuario->cantidad_pokemon, info_acuario);
@@ -271,11 +275,11 @@ int guardar_datos_acuario(acuario_t* acuario, const char* nombre_archivo) {
 void liberar_acuario(acuario_t* acuario) {
     if (!acuario) return;
     liberar_pokemon(acuario->pokemon);
-    free((void*) acuario);
+    free(acuario);
 }
 
 void liberar_arrecife(arrecife_t* arrecife) {
     if (!arrecife) return;
     liberar_pokemon(arrecife->pokemon);
-    free((void *) arrecife);
+    free(arrecife);
 }

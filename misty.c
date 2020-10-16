@@ -89,25 +89,19 @@ void liberar_memoria(arrecife_t** arrecife, acuario_t** acuario);
 int main (int argc, char **argv){
     arrecife_t* arrecife = NULL;
     acuario_t* acuario = NULL;
-    int error = (
-        /* Se crean las estructuras a utilizar */
+    int error_ejecucion = (
         crear_estructuras(&arrecife, &acuario, argc > 1 ? argv[1] : RUTA_ARRECIFE)
-
-        /* Se tralasda y censa */
         || trasladar_y_censar(arrecife, acuario, seleccionar_chico, 4)
         || trasladar_y_censar(arrecife, acuario, seleccionar_lento, 4)
-        || trasladar_y_censar(arrecife, acuario, seleccionar_legendario, 1)
-        || trasladar_y_censar(arrecife, acuario, seleccionar_sublegendario, 1)
         || trasladar_y_censar(arrecife, acuario, seleccionar_magikarp_dorado, 1)
+        || trasladar_y_censar(arrecife, acuario, seleccionar_sublegendario, 1)
+        || trasladar_y_censar(arrecife, acuario, seleccionar_legendario, 1)
     );
 
-    /* Se guardan los pokémon del acuario */
-    if (acuario && acuario->pokemon)
-        guardar_datos_acuario(acuario, argc > 2 ? argv[2] : RUTA_ACUARIO);
+    int error_guardado = guardar_datos_acuario(acuario, argc > 2 ? argv[2] : RUTA_ACUARIO);
 
-    /* Se liberara la memoria utilizada */
     liberar_memoria(&arrecife, &acuario);
-    return error;
+    return error_ejecucion || error_guardado;
 }
 
 /*

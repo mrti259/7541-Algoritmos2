@@ -4,8 +4,9 @@
 
 #define LECTURA "r"
 #define ESCRITURA "w"
-#define FORMATO_LECTURA_ARRECIFE "%[^;];%i;%i;%[^\n]\n"
+#define FORMATO_LECTURA_ARRECIFE "%99[^;];%i;%i;%49[^\n]\n"
 #define FORMATO_ESCRITURA_ACUARIO "%s;%i;%i;%s\n"
+#define CANT_ATRIBUTOS 4
 #define ERROR_APERTURA -1
 #define ERROR_MODIFICANDO -1
 #define ERROR_TRASLADANDO -1
@@ -23,7 +24,7 @@
  */
 int modificar_pokemon(pokemon_t** pokemon, int cantidad_pokemon) {
     pokemon_t* mis_pokemon = realloc(*pokemon, (size_t) cantidad_pokemon * sizeof(pokemon_t));
-    if (mis_pokemon) {
+    if (mis_pokemon || cantidad_pokemon == SIN_POKEMON) {
         *pokemon = mis_pokemon;
         return SIN_ERROR;
     }
@@ -51,7 +52,7 @@ int agregar_pokemon(pokemon_t** mis_pokemon, int* cantidad_pokemon, pokemon_t po
 
 /*
  * Agrega un pokemon al arrecife. Devuelve SIN_ERROR o ERROR_MODIFICANDO.
- * 
+ *
  * Argumentos:
  *      arrecife - puntero al arrecife.
  *      pokemon - pokemon a agregar.
@@ -74,7 +75,7 @@ int agregar_al_acuario(acuario_t* acuario, pokemon_t pokemon) {
 /*
  * Elimina físicamente un pokemon reemplazandolo por el último del vector. Devuelvo
  * SIN_ERROR si se corrigió el tamaño, o un error.
- * 
+ *
  * Argumentos:
  *      mis_pokemon - puntero al vector de pokemon.
  *      posicion_pokemon - posicion del pokemon a eliminar.
@@ -109,7 +110,7 @@ int eliminar_del_arrecife(arrecife_t* arrecife, int posicion_pokemon) {
  */
 void leer_registros_arrecife(FILE* archivo, arrecife_t* arrecife) {
     pokemon_t pokemon;
-    arrecife->pokemon = malloc(sizeof(pokemon_t));
+    arrecife->pokemon = NULL;
     arrecife->cantidad_pokemon = SIN_POKEMON;
     int agregado = SIN_ERROR;
     int leidos = fscanf(archivo,
@@ -119,7 +120,7 @@ void leer_registros_arrecife(FILE* archivo, arrecife_t* arrecife) {
         &(pokemon.peso),
         pokemon.color
         );
-    while (leidos == 4 && agregado == SIN_ERROR && arrecife->pokemon) {
+    while (leidos == CANT_ATRIBUTOS && agregado == SIN_ERROR) {
         agregado = agregar_al_arrecife(arrecife, pokemon);
         leidos = fscanf(archivo,
             FORMATO_LECTURA_ARRECIFE,
@@ -190,16 +191,17 @@ int buscar_pokemon(arrecife_t* arrecife, bool (*selecciona_pokemon)(pokemon_t*),
  *      v_pokemon - vector con las posiciones de los pokemon a mover.
  */
 int mover_pokemon(arrecife_t* arrecife, acuario_t* acuario, int cant_seleccion, int* v_pokemon) {
-    int i = cant_seleccion - 1;
+    int i = cant_seleccion - 1, movidos = SIN_POKEMON;
     bool funciono = true;
     while (i >= SIN_POKEMON && funciono) {
         funciono = agregar_al_acuario(acuario, arrecife->pokemon[v_pokemon[i]]) != ERROR_MODIFICANDO;
         if (funciono) {
             funciono = eliminar_del_arrecife(arrecife, v_pokemon[i]) != ERROR_MODIFICANDO;
+            movidos++;
         }
         i--;
     }
-    return funciono ? cant_seleccion : cant_seleccion - i;
+    return movidos;
 }
 
 /*
@@ -225,6 +227,7 @@ arrecife_t* crear_arrecife(const char* ruta_archivo) {
             leer_registros_arrecife(info_arrecife, arrecife);
         }
         if (arrecife->cantidad_pokemon == SIN_POKEMON) {
+            liberar_arrecife(arrecife);
             arrecife = NULL;
         }
         fclose(info_arrecife);
@@ -234,7 +237,7 @@ arrecife_t* crear_arrecife(const char* ruta_archivo) {
 
 acuario_t* crear_acuario() {
     acuario_t* nuevo_acuario = malloc(sizeof(acuario_t));
-    nuevo_acuario->pokemon = NULL;
+    nuevo_acuario->pokemon = malloc(sizeof(pokemon_t));
     nuevo_acuario->cantidad_pokemon = SIN_POKEMON;
     return nuevo_acuario;
 }
@@ -259,9 +262,6 @@ void censar_arrecife(arrecife_t* arrecife, void (*mostrar_pokemon)(pokemon_t*)) 
 }
 
 int guardar_datos_acuario(acuario_t* acuario, const char* nombre_archivo) {
-    if (!(acuario && acuario->pokemon && acuario->cantidad_pokemon))
-        return ERROR_GUARDANDO;
-    
     FILE *info_acuario = fopen(nombre_archivo, ESCRITURA);
     if (info_acuario) {
         escribir_pokemon(acuario->pokemon, acuario->cantidad_pokemon, info_acuario);

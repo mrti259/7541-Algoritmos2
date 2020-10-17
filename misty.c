@@ -91,17 +91,18 @@ int main (int argc, char **argv){
     acuario_t* acuario = NULL;
     int error_ejecucion = (
         crear_estructuras(&arrecife, &acuario, argc > 1 ? argv[1] : RUTA_ARRECIFE)
+        || trasladar_y_censar(arrecife, acuario, seleccionar_magikarp_dorado, 1)
         || trasladar_y_censar(arrecife, acuario, seleccionar_chico, 4)
         || trasladar_y_censar(arrecife, acuario, seleccionar_lento, 4)
-        || trasladar_y_censar(arrecife, acuario, seleccionar_magikarp_dorado, 1)
         || trasladar_y_censar(arrecife, acuario, seleccionar_sublegendario, 1)
         || trasladar_y_censar(arrecife, acuario, seleccionar_legendario, 1)
     );
 
     int error_guardado = guardar_datos_acuario(acuario, argc > 2 ? argv[2] : RUTA_ACUARIO);
-
     liberar_memoria(&arrecife, &acuario);
-    return error_ejecucion || error_guardado;
+    if (error_ejecucion) printf("Error al crear/trasladar.\n");
+    if (error_guardado) printf("Error al guardar.\n");
+    return 0;
 }
 
 /*
@@ -153,7 +154,7 @@ void crear_nueva_celda(const char* string) {
     memset(celda, ' ', MAX_CELDA * sizeof(char));
     size_t len = strlen(string);
     strcpy(celda + MAX_CELDA - len, string);
-    printf("|%s", celda);
+    printf("|%15s", celda);
 }
 
 /*
@@ -199,7 +200,7 @@ void mostrar_fila_tabla(pokemon_t* pokemon) {
 int crear_estructuras(arrecife_t** arrecife, acuario_t** acuario, const char* ruta_arrecife) {
     *arrecife = crear_arrecife(ruta_arrecife);
     *acuario = crear_acuario();
-    return !(*arrecife) || !(*acuario);
+    return (*arrecife == NULL) | (*acuario == NULL);
 }
 
 int trasladar_y_censar(arrecife_t* arrecife, acuario_t* acuario, bool (*selecciona)(pokemon_t*), int cant_seleccion) {

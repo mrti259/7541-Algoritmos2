@@ -237,8 +237,10 @@ arrecife_t* crear_arrecife(const char* ruta_archivo) {
 
 acuario_t* crear_acuario() {
     acuario_t* nuevo_acuario = malloc(sizeof(acuario_t));
-    nuevo_acuario->pokemon = malloc(sizeof(pokemon_t));
-    nuevo_acuario->cantidad_pokemon = SIN_POKEMON;
+    if (nuevo_acuario) {
+        nuevo_acuario->pokemon = NULL;
+        nuevo_acuario->cantidad_pokemon = SIN_POKEMON;
+    }
     return nuevo_acuario;
 }
 

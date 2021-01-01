@@ -1,0 +1,8 @@
+Magikarp;23;12;rojo
+Magikarp;23;23;rojo
+Magikarp;23;12;rojo
+Magikarp;23;12;rojo
+Tentacool;12;33;azul
+Magikarp;12;76;rojo
+Tentacool;23;23;azul
+Tentacool;13;46;azul

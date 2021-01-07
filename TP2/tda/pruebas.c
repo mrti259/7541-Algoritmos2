@@ -445,9 +445,30 @@ void pruebas_heap_minimal_con_destructor()
     probar_raiz_minimal();
 }
 
+void prueba_de_carga()
+{
+    nuevo_grupo("Prueba de carga");
+    heap_t* heap = heap_crear(comparador_minimal, free);
+    size_t cant_a_insertar = 100000, i = 0;
+    for(size_t j = 0; j < cant_a_insertar; j++)
+    {
+        i += heap_insertar(heap, creador((char)j)) == 0? 1 : 0;
+    }
+    afirmar(
+        i == cant_a_insertar,
+        "Se insertaron 100000 elementos sin errores."
+    );
+    afirmar(
+        heap_cantidad(heap) == cant_a_insertar,
+        "Hay 100000 elementos."
+    );
+    heap_destruir(heap);
+}
+
 void ejecutar_pruebas() {
     probar_crear();
     probar_insertar();
     pruebas_heap_maximal_sin_destructor();
     pruebas_heap_minimal_con_destructor();
+    prueba_de_carga();
 }

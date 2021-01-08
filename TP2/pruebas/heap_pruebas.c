@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "heap.h"
 #include "pa2mm_2.h"
+#include "../tda/heap.h"
 
 enum salidas
 {

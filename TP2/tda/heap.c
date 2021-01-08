@@ -2,12 +2,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+/**
+ * Se definen las constantes de salidas.
+ */
 enum salidas
 {
     ERROR = -1,
     SIN_ERROR = 0
 };
 
+/**
+ * Estructura principal del heap
+ */
 struct heap
 {
     void** elementos;
@@ -18,7 +24,7 @@ struct heap
 };
 
 /**
- *
+ * Devuelve true si hay espacio para insertar un elemento.
  */
 bool heap_hay_lugar(heap_t* heap)
 {
@@ -26,7 +32,8 @@ bool heap_hay_lugar(heap_t* heap)
 }
 
 /**
- *
+ * Agranda el vector de elementos del heap exponencialmente.
+ * Devuelve -1 si falló, o 0.
  */
 int heap_agrandar(heap_t* heap)
 {
@@ -42,9 +49,10 @@ int heap_agrandar(heap_t* heap)
 }
 
 /**
- * TODO
- * El nodo insertado se compara con su nodo padre hasta recuperar la propiedad
- * de heap. Si el resultado de la comparacion es mayor a 0 se intercambian.
+ * Se compara el nodo de la posición dada con su padre. Si el resultado de la
+ * comparacion es mayor a 0 se intercambian.
+ * Se hacen los llamados ascendente y recursivamente hasta recuperar la propiedad
+ * del heap.
  */
 void heap_sift_up(heap_t* heap, size_t posicion)
 {
@@ -65,10 +73,10 @@ void heap_sift_up(heap_t* heap, size_t posicion)
 }
 
 /**
- * TODO
- * Se desplaza el nodo raiz hacia bajo hasta recuperar la propiedad de heap.
- * Se compara con los subarboles hijos. Si el resultado de la comparacion es
- * .............. se intercambian.
+ * Se compara el nodo de la posición nada con los hijos que tenga.
+ * Si alguno de sus hijos es mayor que él, se intercambian.
+ * Se hacen los llamados descentente y recursivamente hasta recuperar la propiedad
+ * del heap.
  */
 void heap_sift_down(heap_t* heap, size_t posicion)
 {
@@ -84,7 +92,7 @@ void heap_sift_down(heap_t* heap, size_t posicion)
         pos_cambio = heap->comparador(
             heap->elementos[pos_hijo_der],
             heap->elementos[pos_hijo_izq]
-        ) > 0 ? pos_hijo_der : pos_hijo_izq;  
+        ) > 0 ? pos_hijo_der : pos_hijo_izq;
     }
     void *nodo = heap->elementos[posicion],
          *hijo = heap->elementos[pos_cambio];
@@ -100,15 +108,16 @@ void heap_sift_down(heap_t* heap, size_t posicion)
 /**
  * Definidos en heap.h.
  */
+
 heap_t* heap_crear(heap_comparador comparador, heap_destructor destructor)
 {
     if (!comparador)
     {
         return NULL;
-    }        
+    }
     heap_t* heap = calloc(1, sizeof(heap_t));
     if (heap)
-    {        
+    {
         heap->comparador = comparador;
         heap->destructor = destructor;
     }
@@ -128,7 +137,7 @@ int heap_insertar(heap_t* heap, void* elemento)
     return SIN_ERROR;
 }
 
-int heap_eliminar_raiz(heap_t* heap)
+int heap_extraer_raiz(heap_t* heap)
 {
     if (!heap_cantidad(heap))
     {

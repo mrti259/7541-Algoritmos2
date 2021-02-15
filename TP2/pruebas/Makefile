@@ -11,5 +11,17 @@ heap:
 	$(CC) $(CFLAGS) $(EXEC) heap_pruebas.c ../tda/heap.c
 	$(VAL) $(VFLAGS) ./$(EXEC)
 
+abb:
+	$(CC) $(CFLAGS) $(EXEC) abb_pruebas.c ../tda/abb.c
+	$(VAL) $(VFLAGS) ./$(EXEC)
+
+lista:
+	$(CC) $(CFLAGS) $(EXEC) lista_pruebas.c ../tda/lista.c
+	$(VAL) $(VFLAGS) ./$(EXEC)
+
+juego:
+	$(CC) $(CFLAGS) $(EXEC) juego_pruebas.c ../juego.c ../tda/heap.c ../tda/lista.c
+	$(VAL) $(VFLAGS) ./$(EXEC)
+
 clean:
 	rm *.exe

@@ -23,20 +23,21 @@ pokemon_t* pokemon_crear();
 void pokemon_liberar(pokemon_t*);
 
 /* Caracteres que identifican los tipos de Pokemon */
-enum tipos
+enum tipos_pokemon
 {
-    AGUA = 'A'
-        , BICHO = 'B'
-        , DRAGON = 'D'
-        , ELECTRICO = 'E'
-        , FUEGO = 'F'
-        , HOJA = 'H'
-        , LUCHA = 'L'
-        , NORMAL = 'N'
-        , PSIQUICO = 'P'
-        , ROCA = 'R'
-        , TOXICO = 'T'
-        , VUELO = 'V'
+    AGUA = 'A' ,
+    BICHO = 'B' ,
+    DRAGON = 'D' ,
+    ELECTRICO = 'E' ,
+    FUEGO = 'F' ,
+    FANTASMA = 'G' ,
+    HOJA = 'H' ,
+    LUCHA = 'L' ,
+    NORMAL = 'N' ,
+    PSIQUICO = 'P' , 
+    ROCA = 'R' ,
+    TOXICO = 'T' ,
+    VUELO = 'V'
 };
 
 /* Maximo nivel que aumentan las estadisticas del pokemon */
@@ -56,7 +57,6 @@ pokemon_t* pokemon_crear()
  */
 void pokemon_liberar(pokemon_t* pokemon)
 {
-    if (!pokemon) return;
     free(pokemon);
 }
 
@@ -111,7 +111,7 @@ entrenador_t* entrenador_crear()
     {
         lista_destruir(pkm_party);
         lista_destruir(pkm_box);
-        entrenador_liberar(entrenador);
+        free(entrenador);
         return NULL;
     }
 
@@ -253,7 +253,7 @@ gimnasio_t* gimnasio_crear()
     if (!gimnasio || !entrenadores)
     {
         lista_destruir(entrenadores);
-        gimnasio_liberar(gimnasio);
+        free(gimnasio);
         return NULL;
     }
 
@@ -284,6 +284,7 @@ size_t gimnasio_entrenadores(gimnasio_t* gimnasio)
     {
         return 0;
     }
+
     return lista_elementos(gimnasio->entrenadores);
 }
 
@@ -329,9 +330,9 @@ void juego_liberar();
  */
 int gimnasio_comparador(void* gimnasio_1, void* gimnasio_2)
 {
-    int
-        dificultad_1 = gimnasio_1 ? ((gimnasio_t*)gimnasio_1)->dificultad : 0 ,
-                     dificultad_2 = gimnasio_2 ? ((gimnasio_t*)gimnasio_2)->dificultad : 0 ;
+    int dificultad_1 = gimnasio_1 ? ((gimnasio_t*)gimnasio_1)->dificultad : 0 ,
+        dificultad_2 = gimnasio_2 ? ((gimnasio_t*)gimnasio_2)->dificultad : 0 ;
+
     return dificultad_2 - dificultad_1;
 }
 
@@ -353,7 +354,7 @@ juego_t* juego_crear()
     {
         heap_destruir(gimnasios);
         entrenador_liberar(jugador);
-        juego_liberar(juego);
+        free(juego);
         return NULL;
     }
 
@@ -517,6 +518,33 @@ int cargar_gimnasios(const char* ruta_archivo, juego_t* juego)
         cargados += cargar_gimnasio(archivo, juego) == SIN_ERROR ? 1 : 0;
     }
     
+    fclose(archivo);
+    return cargados > 0 ? SIN_ERROR : ERROR;
+}
+
+/**
+ *
+ */
+int cargar_jugador(const char* ruta_archivo, juego_t* juego)
+{
+    if (!ruta_archivo || !juego)
+    {
+        return ERROR;
+    }
+
+    FILE* archivo = fopen(ruta_archivo, LECTURA);
+    if (!archivo)
+    {
+        return ERROR;
+    }
+
+    int cargados = 0;
+    int leido = fscanf(archivo, "E" ENTRENADOR_FORMATO_LECTURA, juego->jugador->nombre);
+    while (leido == ENTRENADOR_ATTR_LEIDOS && fgetc(archivo) == POKEMON)
+    {
+        cargados += cargar_pokemon(archivo, juego->jugador) == SIN_ERROR ? 1 : 0;
+    }
+
     fclose(archivo);
     return cargados > 0 ? SIN_ERROR : ERROR;
 }

@@ -3,24 +3,6 @@
 #include "pa2mm_2.h"
 #include "../tda/heap.h"
 
-enum salidas
-{
-    ERROR = -1,
-    SIN_ERROR = 0
-};
-
-/**
- * Hace el llamado a todas las pruebas unitarias y de integración.
- */
-void ejecutar_pruebas();
-
-int main()
-{
-    ejecutar_pruebas();
-    mostrar_reporte();
-    return 0;
-}
-
 /*
  * Reserva memoria dinámica para un caracter.
  */
@@ -218,7 +200,7 @@ void probar_raiz_maximal()
 {
     nuevo_grupo("Pruebas con heap_raiz (maximal)");
     heap_t* heap = NULL;
-    char caracteres[] = {'a', 'l', 'g', 'a', ' ', 'm', 'a', 'r', 'i', 'n', 'a', '\n'};
+    char caracteres[] = {'a', 'l', 'g', 'a', 's', ' ', 'm', 'a', 'r', 'i', 'n', 'a', 's', '\n'};
 
     afirmar(
         heap_raiz(heap) == NULL,
@@ -234,11 +216,23 @@ void probar_raiz_maximal()
     {
         heap_insertar(heap, &(caracteres[i]));
     }
-    afirmar(heap_cantidad(heap) == 12, "Ahora el heap contiene 12 elementos (\"alga marina\\n\")");
+    afirmar(heap_cantidad(heap) == 14, "Ahora el heap contiene 14 elementos (\"algas marinas\\n\")");
 
     afirmar(
+        *(char*) heap_raiz(heap) == 's',
+        "El heap es maximal, por lo cual en la raíz se encuentra 's'."
+    );
+
+    heap_extraer_raiz(heap);
+    afirmar(
+        *(char*) heap_raiz(heap) == 's',
+        "Elimino un elemento y en la raíz queda 's'."
+    );
+
+    heap_extraer_raiz(heap);
+    afirmar(
         *(char*) heap_raiz(heap) == 'r',
-        "El heap es maximal, por lo cual en la raíz se encuentra 'r'."
+        "Elimino un elemento y en la raíz queda 'r'."
     );
 
     heap_extraer_raiz(heap);
@@ -369,7 +363,7 @@ void probar_raiz_minimal()
 {
     nuevo_grupo("Pruebas heap_raiz (minimal)");
     heap_t* heap = NULL;
-    char caracteres[] = {'a', 'l', 'g', 'a', ' ', 'm', 'a', 'r', 'i', 'n', 'a', '\n'};
+    char caracteres[] = {'a', 'l', 'g', 'a', 's', ' ', 'm', 'a', 'r', 'i', 'n', 'a', 's', '\n'};
 
     afirmar(
         heap_raiz(heap) == NULL,
@@ -385,7 +379,7 @@ void probar_raiz_minimal()
     {
         heap_insertar(heap, creador(caracteres[i]));
     }
-    afirmar(heap_cantidad(heap) == 12, "Ahora el heap contiene 12 elementos (\"alga marina\\n\")");
+    afirmar(heap_cantidad(heap) == 14, "Ahora el heap contiene 14 elementos (\"algas marinas\\n\")");
 
     afirmar(
         *(char*) heap_raiz(heap) == '\n',
@@ -458,6 +452,18 @@ void probar_raiz_minimal()
         "Elimino un elemento y en la raíz queda 'r'."
     );
 
+    heap_extraer_raiz(heap);
+    afirmar(
+        *(char*) heap_raiz(heap) == 's',
+        "Elimino un elemento y en la raíz queda 's'."
+    );
+
+    heap_extraer_raiz(heap);
+    afirmar(
+        *(char*) heap_raiz(heap) == 's',
+        "Elimino un elemento y en la raíz queda 's'."
+    );
+
     heap_destruir(heap);
 }
 
@@ -480,7 +486,7 @@ void pruebas_heap_minimal_con_destructor()
 }
 
 /**
- * Valida en casos de insertar muchos elementos.
+ * Verifica la insercion de muchos elementos.
  */
 void prueba_de_carga()
 {
@@ -502,10 +508,22 @@ void prueba_de_carga()
     heap_destruir(heap);
 }
 
-void ejecutar_pruebas() {
+/**
+ * Hace el llamado a todas las pruebas unitarias y de integración.
+ */
+void ejecutar_pruebas()
+{
     probar_crear();
     probar_insertar();
     pruebas_heap_maximal_sin_destructor();
     pruebas_heap_minimal_con_destructor();
     prueba_de_carga();
 }
+
+int main()
+{
+    ejecutar_pruebas();
+    mostrar_reporte();
+    return 0;
+}
+

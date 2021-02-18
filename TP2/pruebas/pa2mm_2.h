@@ -14,7 +14,7 @@ corrección de mensaje de salida final.
 #define VERDE "\x1B[32;1m"
 #define ROJO "\x1B[31;1m"
 #define AMARILLO "\x1B[33;1m"
-#define NORMAL "\x1B[0m"
+#define RESET "\x1B[0m"
 
 #define TILDE "✓"
 #define CRUZ "✗"
@@ -33,8 +33,8 @@ void __atajarse(void (*handler)(int)){
 
 void __morir(int signum){
     if(__prueba_actual)
-        printf(ROJO "\n\nERROR MIENTRAS SE EJECUTABA LA PRUEBA: " AMARILLO "'%s'\n\n" NORMAL, __prueba_actual);
-    else printf(ROJO "\n\nFINALIZACION ANORMAL DE LAS PRUEBAS\n\n" NORMAL);
+        printf(ROJO "\n\nERROR MIENTRAS SE EJECUTABA LA PRUEBA: " AMARILLO "'%s'\n\n" RESET, __prueba_actual);
+    else printf(ROJO "\n\nFINALIZACION ANORMAL DE LAS PRUEBAS\n\n" RESET);
     fflush(stdout);
     __atajarse(SIG_DFL);
 }
@@ -48,7 +48,7 @@ void __morir(int signum){
             __pruebas_fallidas++;\
             printf( ROJO CRUZ " ");\
         }\
-        printf(BLANCO "%s\n" NORMAL, __prueba_actual);\
+        printf(BLANCO "%s\n" RESET, __prueba_actual);\
         fflush(stdout);\
         __prueba_actual = NULL;\
         __pruebas_corridas++;\
@@ -57,12 +57,12 @@ void __morir(int signum){
 void nuevo_grupo(const char* descripcion){
     printf(AMARILLO "\n%s\n", descripcion);
     while(*(descripcion++)) printf("=");
-    printf(BLANCO "\n" NORMAL);
+    printf(BLANCO "\n" RESET);
 }
 
 int mostrar_reporte() {
     printf(BLANCO "\n---------------------------------\n"
-                 "%i pruebas corridas, %i error%s - %s\n" NORMAL,
+                 "%i pruebas corridas, %i error%s - %s\n" RESET,
                  __pruebas_corridas,
                  __pruebas_fallidas,
                  __pruebas_fallidas == 1 ? "" : "es",

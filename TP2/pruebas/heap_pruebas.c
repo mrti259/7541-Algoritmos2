@@ -3,24 +3,6 @@
 #include "pa2mm_2.h"
 #include "../tda/heap.h"
 
-enum salidas
-{
-    ERROR = -1,
-    SIN_ERROR = 0
-};
-
-/**
- * Hace el llamado a todas las pruebas unitarias y de integración.
- */
-void ejecutar_pruebas();
-
-int main()
-{
-    ejecutar_pruebas();
-    mostrar_reporte();
-    return 0;
-}
-
 /*
  * Reserva memoria dinámica para un caracter.
  */
@@ -504,7 +486,7 @@ void pruebas_heap_minimal_con_destructor()
 }
 
 /**
- * Valida en casos de insertar muchos elementos.
+ * Verifica la insercion de muchos elementos.
  */
 void prueba_de_carga()
 {
@@ -526,6 +508,9 @@ void prueba_de_carga()
     heap_destruir(heap);
 }
 
+/**
+ * Hace el llamado a todas las pruebas unitarias y de integración.
+ */
 void ejecutar_pruebas()
 {
     probar_crear();
@@ -534,3 +519,11 @@ void ejecutar_pruebas()
     pruebas_heap_minimal_con_destructor();
     prueba_de_carga();
 }
+
+int main()
+{
+    ejecutar_pruebas();
+    mostrar_reporte();
+    return 0;
+}
+

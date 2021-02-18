@@ -93,7 +93,7 @@ size_t insertar_mensaje_al_principio(lista_t* lista, char* mensaje, size_t tope)
  */
 void mostrar_letras_de_lista(lista_t* lista) {
     lista_iterador_t *iterador = lista_iterador_crear(lista);
-    printf(NORMAL "\n");
+    printf(RESET "\n");
 
     while (lista_iterador_tiene_siguiente(iterador)) {
         char* letra = lista_iterador_elemento_actual(iterador);

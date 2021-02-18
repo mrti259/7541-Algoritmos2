@@ -20,7 +20,7 @@ lista:
 	$(VAL) $(VFLAGS) ./$(EXEC)
 
 juego:
-	$(CC) $(CFLAGS) $(EXEC) juego_pruebas.c ../juego.c ../tda/heap.c ../tda/lista.c
+	$(CC) $(CFLAGS) $(EXEC) juego_pruebas.c ../tda/heap.c ../tda/lista.c ../batallas.c
 	$(VAL) $(VFLAGS) ./$(EXEC)
 
 clean:

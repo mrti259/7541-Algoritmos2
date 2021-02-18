@@ -1,30 +1,58 @@
-#include <stdio.h>
 #include "pa2mm_2.h"
-#include "../juego.h"
+#include "../juego.c"
+#include "../batallas.h"
+#include <stdio.h>
+#include <string.h>
 
 const char *ARCHIVO = "datos.tmp",
     *ESCRIBIR = "w",
     *LEER = "r";
 
-void pruebas_pokemon();
-extern pokemon_t* pokemon_crear();
-extern void pokemon_liberar(pokemon_t*);
-
+/**
+ * Pruebas de Pokémon.
+ * Si se crea correctamente, se setean sus valores y se verifica que sus
+ * funciones devuelvan los valores correctos.
+ *
+ * No deben haber perdidas de memoria.
+ */
 void pruebas_pokemon()
 {
-    nuevo_grupo("Pruebas Pokemon");
+    nuevo_grupo("Pruebas Pokémon");
     pokemon_t* pokemon = pokemon_crear();
     afirmar(pokemon != NULL, "Puedo crear un pokemon");
+
+    if (pokemon)
+    {
+        pokemon->ataque = 30;
+        pokemon->defensa = 20;
+        pokemon->velocidad = 40;
+        pokemon->adicional = 62;
+        pokemon->tipo_1 = AGUA;
+        pokemon->tipo_2 = BICHO;
+        strcpy(pokemon->nombre, "Dewpider");
+    }
+    afirmar(pokemon_ataque(pokemon) == 92, "Tiene 92 de ataque");
+    afirmar(pokemon_defensa(pokemon) == 82, "Tiene 82 de defensa");
+    afirmar(pokemon_velocidad(pokemon) == 102, "Tiene 102 de velocidad");
+    afirmar(pokemon_puede_subir_estadisticas(pokemon), "Puede subir estadisticas");
+    afirmar(pokemon_subir_estadisticas(pokemon) == SIN_ERROR, "Sube estadisticas");
+    afirmar(!pokemon_puede_subir_estadisticas(pokemon), "No puede subir más");
+    afirmar(pokemon_ataque(pokemon) == 93, "Tiene 93 de ataque");
+    afirmar(pokemon_defensa(pokemon) == 83, "Tiene 83 de defensa");
+    afirmar(pokemon_velocidad(pokemon) == 103, "Tiene 103 de velocidad");
+    afirmar(pokemon_tipo_principal(pokemon) == AGUA, "El tipo principal es AGUA");
+    afirmar(pokemon_tipo_secundario(pokemon) == BICHO, "El tipo secundario es BICHO");
     
+    char nombre[MAX_NOMBRE];
+    pokemon_nombre(pokemon, nombre);
+    afirmar(strcmp("Dewpider", nombre) == 0, "Es un Dewpider");
+
     pokemon_liberar(pokemon);
 }
 
-void pruebas_entrenador();
-extern entrenador_t* entrenador_crear();
-extern void entrenador_liberar(entrenador_t*);
-extern int entrenador_agregar_pokemon(entrenador_t*, pokemon_t*);
-extern int cargar_pokemon(FILE*, entrenador_t*);
-
+/**
+ * Crea un archivo temporal con un registro de un Pokémon. 
+ */
 void crear_archivo_pokemon()
 {
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
@@ -35,6 +63,25 @@ void crear_archivo_pokemon()
     }
 }
 
+/**
+ * Crea un archivo temporal con un registro de un Pokémon dañado. 
+ */
+void crear_archivo_pokemon_daniado()
+{
+    FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
+    if (archivo)
+    {
+        fprintf(archivo, ";Goldeesdasdasdasdasdasjdhasdhaskjdfhlksahdlkjfsajdkfjakshdkjsahdklashdjkashdlkasjhdkjlshdklahsjdlkahjsdakjsdhalkdhsakjshdaklhsdkajshdkalhsdklahsdklahsdkjahsdkjlhsadlkahsdkajksadhflhasdn;A;A;40;50;30\n");
+        fclose(archivo);
+    }
+}
+
+/**
+ * Pruebas de entrenador.
+ * Puedo crear un entrenador y cargarle un Pokémon desde un registro.
+ *
+ * No deben haber perdidas de memoria.
+ */
 void pruebas_entrenador()
 {
     nuevo_grupo("Pruebas Entrenador");
@@ -49,10 +96,17 @@ void pruebas_entrenador()
     crear_archivo_pokemon();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_pokemon(archivo, entrenador) == 0,
-            "Cargar un pokemon desde un archivo valido devuelve 0"
+            "Cargar un pokemon desde un archivo válido devuelve 0"
             );
     afirmar(cargar_pokemon(archivo, entrenador) == -1,
             "Si no puede cargar un pokemon devuelve -1"
+            );
+    fclose(archivo);
+    
+    crear_archivo_pokemon_daniado();
+    archivo = fopen(ARCHIVO, LEER);
+    afirmar(cargar_pokemon(archivo, entrenador) == -1,
+            "Cargar un pokemon desde un archivo dañado devuelve -1"
             );
     fclose(archivo);
     remove(ARCHIVO);
@@ -60,12 +114,9 @@ void pruebas_entrenador()
     entrenador_liberar(entrenador);
 }
 
-void pruebas_gimnasio();
-extern gimnasio_t* gimnasio_crear();
-extern void gimnasio_liberar(gimnasio_t*);
-extern int gimnasio_agregar_entrenador(gimnasio_t*, entrenador_t*);
-extern int cargar_entrenador(FILE*, gimnasio_t*);
-
+/**
+ * Crea un archivo temporal con un registro de un entrenador y sus Pokémon.
+ */
 void crear_archivo_entrenador()
 {
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
@@ -76,7 +127,26 @@ void crear_archivo_entrenador()
         fclose(archivo);
     }
 }
+/**
+ * Crea un archivo temporal con un registro de un entrenador dañado.
+ */
+void crear_archivo_entrenador_daniado()
+{
+    FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
+    if (archivo)
+    {
+        fprintf(archivo, ";Dominguera Dianasdkjashdajksdhjakshdjkashdjlkahsdkjlahsdkljahsdjkhasdkjhaskdlhakljsdhakjsdhalkhdsaklsjhdakjshdlkhsdkalhjsdkajshdlkahdjsajkhdskjashdkajshdlkahsdkalhdsaklhdjakjhdsakjshdakhjsdakjshdakjshdakjhsdaklhsdakhsdkjas\n");
+        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
+        fclose(archivo);
+    }
+}
 
+/**
+ * Pruebas de gimnasio.
+ * Puedo crear un gimnasio y cargarle entrenadores y Pokémon desde un archivo.
+ *
+ * No deben haber perdidas de memoria.
+ */
 void pruebas_gimnasio()
 {
     nuevo_grupo("Pruebas Gimnasio");
@@ -97,17 +167,21 @@ void pruebas_gimnasio()
             "Si no puede cargar un entrenador devuelve -1"
             );
     fclose(archivo);
+
+    crear_archivo_entrenador_daniado();
+    archivo = fopen(ARCHIVO, LEER);
+    afirmar(cargar_entrenador(archivo, gimnasio) == -1,
+            "Cargar un entrenador desde un archivo dañado devuelve -1"
+            );
+    fclose(archivo);
     remove(ARCHIVO);
 
     gimnasio_liberar(gimnasio);
 }
 
-void pruebas_juego();
-extern juego_t* juego_crear();
-extern void juego_liberar(juego_t*);
-extern int juego_agregar_gimnasio(juego_t*, gimnasio_t*);
-extern int cargar_gimnasio(FILE*, juego_t*);
-
+/**
+ * Crea un archivo temporal con un registro de un gimnasio y sus entrenadores.
+ */
 void crear_archivo_gimnasio()
 {
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
@@ -126,6 +200,30 @@ void crear_archivo_gimnasio()
     }
 }
 
+/**
+ * Crea un archivo temporal con un registro de un gimnasio dañado.
+ */
+void crear_archivo_gimnasio_daniado()
+{
+    FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
+    if (archivo)
+    {
+        fprintf(archivo, ";Gimnasio de Ciudad Celsdjkahsdjkashdjkashdkjlshadjklashdjkahsdkjlahsdkljashdjkashdkjashdkjladkjashdkahsdklhsadjahsdkjahsdklahsdlkjhasdkhaskdhakdslhaksdjhaksjdhakjsdhakjshdkahsdkahdalkjshdaklhdsakjshdkalhdsakeste;15;3\n");
+        fprintf(archivo, "L;Misty\n");
+        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
+        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
+        fprintf(archivo, "E;Dominguera Diana\n");
+        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
+        fprintf(archivo, "E;Nadador Luis\n");
+        fprintf(archivo, "P;Horsea;A;A;45;30;20\n");
+        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+        fclose(archivo);
+    }
+}
+
+/**
+ * Crea un archivo temporal con más de un registro de gimnasios
+ */
 void crear_archivo_gimnasios()
 {
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
@@ -150,10 +248,33 @@ void crear_archivo_gimnasios()
         fprintf(archivo, "E;Nadador Luis\n");
         fprintf(archivo, "P;Horsea;A;A;45;30;20\n");
         fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+
+        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;3\n");
+        fprintf(archivo, "L;Misty\n");
+        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
+        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
+        fprintf(archivo, "E;Dominguera Diana\n");
+        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
+        fprintf(archivo, "E;Nadador Luis\n");
+        fprintf(archivo, "P;Horsea;A;A;45;30;20\n");
+        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+
+        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;3\n");
+        fprintf(archivo, "L;Misty\n");
+        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
+        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
+        fprintf(archivo, "E;Dominguera Diana\n");
+        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
+        fprintf(archivo, "E;Nadador Luis\n");
+        fprintf(archivo, "P;Horsedasdasdasdasdjsahdfgashjdfgaksjhdgfhjaksgdfkjhasgdfjkhgdjhfasdgfjhafkjaa;A;A;45;30;20\n");
+        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
         fclose(archivo);
     }
 }
 
+/**
+ * Crea un archivo temporal con datos de un jugador.
+ */ 
 void crear_archivo_jugador()
 {
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
@@ -175,6 +296,35 @@ void crear_archivo_jugador()
     }
 }
 
+/**
+ * Crea un archivo temporal con datos de un jugador dañado.
+ */ 
+void crear_archivo_jugador_daniado()
+{
+    FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
+    if (archivo)
+    {
+        fprintf(archivo, "E;Ash\n");
+        fprintf(archivo, "P;Pikachu;E;E;12312370;31231231230;312312310\n");
+        fprintf(archivo, "P;Butterfree;B;V;50;40;50\n");
+        fprintf(archivo, "P;Pidgeotto;V;N;65;40;30\n");
+        fprintf(archivo, "P;Bulbasaur;P;P;20;40;30\n");
+        fprintf(archivo, "P;Charmander;F;F;40;30;20\n");
+        fprintf(archivo, "P;SquirtleA;A;30;20;40\n");
+        fprintf(archivo, "P;Krabby;A;A;20;30;20\n");
+        fprintf(archivo, "P;Raticate;N;N;30;50;20\n");
+        fprintf(archivo, "P;Haunter;G;G;40;60;20\n");
+        fprintf(archivo, "P;Primeape;L;N;50;60;30\n");
+        fprintf(archivo, "P;Muk;T;T;20;40;60\n");
+        fclose(archivo);
+    }
+}
+
+/**
+ * Pruebas de juego.
+ * Crea un juego, carga los archivos de gimnasios y personaje que un jugador
+ * pueda ingresar.
+ */
 void pruebas_juego()
 {
     nuevo_grupo("Pruebas Juego");
@@ -196,9 +346,19 @@ void pruebas_juego()
             );
     fclose(archivo);
 
+    crear_archivo_gimnasio_daniado();
+    archivo = fopen(ARCHIVO, LEER);
+    afirmar(cargar_gimnasio(archivo, juego) == -1,
+            "Cargar un gimnasio desde un archivo dañado devuelve -0"
+            );
+    fclose(archivo);
+
     crear_archivo_gimnasios();
     afirmar(cargar_gimnasios(ARCHIVO, juego) == 0,
-            "Cargar gimnasios desde un archivo valido devuelve 0"
+            "Cargar gimnasios desde un archivo valido aunque dañado devuelve 0"
+            );
+    afirmar(juego_gimnasios(juego) == 3,
+            "Se cuenta con 4 Gimnasios"
             );
 
     remove(ARCHIVO);
@@ -215,36 +375,83 @@ void pruebas_juego()
             "Cargar un jugador principal desde un archivo valido devuelve 0"
            );
 
-    remove(ARCHIVO);
+    crear_archivo_gimnasio();
     afirmar(cargar_jugador(ARCHIVO, juego) == -1,
             "Cargar un jugador principal desde un archivo no valido devuelve -1"
+           );
+
+    crear_archivo_jugador_daniado();
+    afirmar(cargar_jugador(ARCHIVO, juego) == -1,
+            "Cargar un jugador principal desde un archivo dañado devuelve -1"
+           );
+
+    remove(ARCHIVO);
+    afirmar(cargar_jugador(ARCHIVO, juego) == -1,
+            "Cargar un jugador principal sin un archivo devuelve -1"
            );
 
     juego_liberar(juego);
 }
 
+/**
+ * Prueba las funciones de batalla.
+ * Se tiene que mantener la constancia del ganador
+ */
 void pruebas_batallas()
 {
     nuevo_grupo("Pruebas batallas");
 
-    afirmar(0,
-            ""
+    pokemon_t *pkm_1 = pokemon_crear(), *pkm_2 = pokemon_crear();
+    if (pkm_1 && pkm_2)
+    {
+        pkm_1->ataque = 20;
+        pkm_1->defensa = 26;
+        pkm_1->velocidad = 23;
+        pkm_1->adicional = 9;
+        pkm_1->tipo_1 = FUEGO;
+        pkm_1->tipo_2 = VUELO;
+
+        pkm_2->ataque = 26;
+        pkm_2->defensa = 22;
+        pkm_2->velocidad = 20;
+        pkm_2->adicional = 0;
+        pkm_2->tipo_1 = BICHO;
+        pkm_2->tipo_2 = ROCA;
+    }
+
+    afirmar(funcion_batalla_1(pkm_1, pkm_2) == GANO_PRIMERO,
+            "Funcion batalla 1: Gana primero"
            );
-    afirmar(0,
-            ""
-            );
-    afirmar(0,
-            ""
+    afirmar(funcion_batalla_1(pkm_2, pkm_1) == GANO_SEGUNDO,
+            "Funcion batalla 1: Gana segundo"
            );
-    afirmar(0,
-            ""
+    afirmar(funcion_batalla_2(pkm_1, pkm_2) == GANO_PRIMERO,
+            "Funcion batalla 2: Gana primero"
            );
-    afirmar(0,
-            ""
-            );
-    afirmar(0,
-            ""
+    afirmar(funcion_batalla_2(pkm_2, pkm_1) == GANO_SEGUNDO,
+            "Funcion batalla 2: Gana segundo"
            );
+    afirmar(funcion_batalla_3(pkm_1, pkm_2) == GANO_PRIMERO,
+            "Funcion batalla 3: Gana primero"
+           );
+    afirmar(funcion_batalla_3(pkm_2, pkm_1) == GANO_SEGUNDO,
+            "Funcion batalla 3: Gana segundo"
+           );
+    afirmar(funcion_batalla_4(pkm_1, pkm_2) == GANO_PRIMERO,
+            "Funcion batalla 4: Gana primero"
+           );
+    afirmar(funcion_batalla_4(pkm_2, pkm_1) == GANO_SEGUNDO,
+            "Funcion batalla 4: Gana segundo"
+           );
+    afirmar(funcion_batalla_5(pkm_1, pkm_2) == GANO_PRIMERO,
+            "Funcion batalla 5: Gana primero"
+           );
+    afirmar(funcion_batalla_5(pkm_2, pkm_1) == GANO_SEGUNDO,
+            "Funcion batalla 5: Gana segundo"
+           );
+
+    pokemon_liberar(pkm_1);
+    pokemon_liberar(pkm_2);
 }
 
 void ejecutar_pruebas()

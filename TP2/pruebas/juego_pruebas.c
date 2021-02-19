@@ -27,8 +27,8 @@ void pruebas_pokemon()
         pokemon->defensa = 20;
         pokemon->velocidad = 40;
         pokemon->adicional = 62;
-        pokemon->tipo_1 = AGUA;
-        pokemon->tipo_2 = BICHO;
+        pokemon->tipo_1 = 'A';
+        pokemon->tipo_2 = 'B';
         strcpy(pokemon->nombre, "Dewpider");
     }
     afirmar(pokemon_ataque(pokemon) == 92, "Tiene 92 de ataque");
@@ -40,8 +40,8 @@ void pruebas_pokemon()
     afirmar(pokemon_ataque(pokemon) == 93, "Tiene 93 de ataque");
     afirmar(pokemon_defensa(pokemon) == 83, "Tiene 83 de defensa");
     afirmar(pokemon_velocidad(pokemon) == 103, "Tiene 103 de velocidad");
-    afirmar(pokemon_tipo_principal(pokemon) == AGUA, "El tipo principal es AGUA");
-    afirmar(pokemon_tipo_secundario(pokemon) == BICHO, "El tipo secundario es BICHO");
+    afirmar(pokemon_tipo_principal(pokemon) == 'A', "El tipo principal es AGUA");
+    afirmar(pokemon_tipo_secundario(pokemon) == 'B', "El tipo secundario es BICHO");
     
     char nombre[MAX_NOMBRE];
     pokemon_nombre(pokemon, nombre);
@@ -408,15 +408,17 @@ void pruebas_batallas()
         pkm_1->defensa = 26;
         pkm_1->velocidad = 23;
         pkm_1->adicional = 9;
-        pkm_1->tipo_1 = FUEGO;
-        pkm_1->tipo_2 = VUELO;
+        pkm_1->tipo_1 = 'F';
+        pkm_1->tipo_2 = 'V';
+        strcpy(pkm_1->nombre, "Charizard");
 
         pkm_2->ataque = 26;
         pkm_2->defensa = 22;
         pkm_2->velocidad = 20;
         pkm_2->adicional = 0;
-        pkm_2->tipo_1 = BICHO;
-        pkm_2->tipo_2 = ROCA;
+        pkm_2->tipo_1 = 'N';
+        pkm_2->tipo_2 = 'V';
+        strcpy(pkm_2->nombre, "Pidgeotto");
     }
 
     afirmar(funcion_batalla_1(pkm_1, pkm_2) == GANO_PRIMERO,

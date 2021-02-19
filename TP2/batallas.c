@@ -4,6 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Caracteres que identifican los tipos de Pokemon */
+enum tipos_pokemon
+{
+    AGUA = 'A' ,
+    BICHO = 'B' ,
+    DRAGON = 'D' ,
+    ELECTRICO = 'E' ,
+    FUEGO = 'F' ,
+    FANTASMA = 'G' ,
+    HOJA = 'H' ,
+    LUCHA = 'L' ,
+    NORMAL = 'N' ,
+    PSIQUICO = 'P' , 
+    ROCA = 'R' ,
+    TOXICO = 'T' ,
+    VUELO = 'V'
+};
+
 /**
  * Gana el más fuerte.
  */

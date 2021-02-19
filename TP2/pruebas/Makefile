@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0 -o
 VAL=valgrind
 VFLAGS=--leak-check=full --track-origins=yes --show-reachable=yes
-EXEC=pruebas.exe
+EXEC=pruebas.bin
 
 lint:
 	cppcheck --enable=all ../*.c
@@ -24,4 +24,4 @@ juego:
 	$(VAL) $(VFLAGS) ./$(EXEC)
 
 clean:
-	rm *.exe
+	rm *.bin

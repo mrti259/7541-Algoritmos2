@@ -68,12 +68,7 @@ int pokemon_subir_estadisticas(pokemon_t* pokemon)
  */
 int pokemon_ataque(pokemon_t* pokemon)
 {
-    if (!pokemon)
-    {
-        return 0;
-    }
-    
-    return pokemon->ataque + pokemon->adicional;
+    return pokemon ? pokemon->ataque + pokemon->adicional : 0;
 }
 
 /**
@@ -81,12 +76,7 @@ int pokemon_ataque(pokemon_t* pokemon)
  */
 int pokemon_defensa(pokemon_t* pokemon)
 {
-    if (!pokemon)
-    {
-        return 0;
-    }
-    
-    return pokemon->defensa + pokemon->adicional;
+    return pokemon ? pokemon->defensa + pokemon->adicional : 0;
 }
 
 /**
@@ -94,12 +84,7 @@ int pokemon_defensa(pokemon_t* pokemon)
  */
 int pokemon_velocidad(pokemon_t* pokemon)
 {
-    if (!pokemon)
-    {
-        return 0;
-    }
-    
-    return pokemon->velocidad + pokemon->adicional;
+    return pokemon ? pokemon->velocidad + pokemon->adicional : 0;
 }
 
 /**
@@ -107,12 +92,7 @@ int pokemon_velocidad(pokemon_t* pokemon)
  */
 char pokemon_tipo_principal(pokemon_t* pokemon)
 {
-    if (!pokemon)
-    {
-        return (char) 0;
-    }
-
-    return pokemon->tipo_1;
+    return pokemon ? pokemon->tipo_1 : (char) 0;
 }
 
 /**
@@ -120,12 +100,7 @@ char pokemon_tipo_principal(pokemon_t* pokemon)
  */
 char pokemon_tipo_secundario(pokemon_t* pokemon)
 {
-    if (!pokemon)
-    {
-        return (char) 0;
-    }
-
-    return pokemon->tipo_2;
+    return pokemon ? pokemon->tipo_2 : (char) 0;
 }
 
 /**
@@ -133,12 +108,7 @@ char pokemon_tipo_secundario(pokemon_t* pokemon)
  */
 void pokemon_nombre(pokemon_t* pokemon, char nombre[MAX_NOMBRE])
 {
-    if (!pokemon)
-    {
-        memset(nombre, 0, sizeof(char) * MAX_NOMBRE);
-    }
-    
-    strcpy(nombre, pokemon->nombre);
+    strcpy(nombre, pokemon ? pokemon->nombre : "");
 }
 
 /*******************************************************************************
@@ -242,12 +212,7 @@ int entrenador_agregar_pokemon(entrenador_t* entrenador, pokemon_t* pokemon)
  */
 size_t entrenador_cantidad_party(entrenador_t* entrenador)
 {
-    if (!entrenador)
-    {
-        return 0;
-    }
-
-    return lista_elementos(entrenador->pkm_party);
+    return entrenador ? lista_elementos(entrenador->pkm_party) : 0;
 }
 
 /**
@@ -255,12 +220,7 @@ size_t entrenador_cantidad_party(entrenador_t* entrenador)
  */
 size_t entrenador_cantidad_obtenidos(entrenador_t* entrenador)
 {
-    if (!entrenador)
-    {
-        return 0;
-    }
-
-    return lista_elementos(entrenador->pkm_obtenidos);
+    return entrenador ? lista_elementos(entrenador->pkm_obtenidos) : 0;
 }
 
 /**
@@ -285,6 +245,14 @@ void entrenador_liberar(entrenador_t* entrenador)
     lista_destruir(entrenador->pkm_party);
     lista_destruir(entrenador->pkm_obtenidos);
     free(entrenador);
+}
+
+/**
+ * Definido en juego.h
+ */
+void entrenador_nombre(entrenador_t* entrenador, char nombre[MAX_NOMBRE])
+{
+    strcpy(nombre, entrenador ? entrenador->nombre : "");
 }
 
 /*******************************************************************************
@@ -336,12 +304,7 @@ int gimnasio_agregar_entrenador(gimnasio_t* gimnasio, entrenador_t* entrenador)
  */
 size_t gimnasio_entrenadores(gimnasio_t* gimnasio)
 {
-    if (!gimnasio) 
-    {
-        return 0;
-    }
-
-    return lista_elementos(gimnasio->entrenadores);
+    return gimnasio ? lista_elementos(gimnasio->entrenadores) : 0;
 }
 
 /**
@@ -365,6 +328,14 @@ void gimnasio_liberar(gimnasio_t* gimnasio)
     lista_destruir(gimnasio->entrenadores);
     free(gimnasio);
 }
+/**
+ * Definido en juego.h
+ */
+void gimnasio_nombre(gimnasio_t* gimnasio, char nombre[MAX_NOMBRE])
+{
+    strcpy(nombre, gimnasio ? gimnasio->nombre : "");
+}
+
 
 /*******************************************************************************
  * Juego
@@ -398,7 +369,7 @@ void gimnasio_destruir(void* gimnasio)
 }
 
 /**
- * Devuelve un puntero a un juego creado en el heap o NULL si falló.
+ * Definido en juego.h
  */
 juego_t* juego_crear()
 {
@@ -438,16 +409,11 @@ int juego_agregar_gimnasio(juego_t* juego, gimnasio_t* gimnasio)
  */
 size_t juego_gimnasios(juego_t* juego)
 {
-    if (!juego)
-    {
-        return 0;
-    }
-
-    return heap_cantidad(juego->gimnasios);
+    return juego ? heap_cantidad(juego->gimnasios) : 0;
 }
 
 /**
- * Libera la memoria dedicada a la instancia de juego y a todas sus estructuras.
+ * Definido en juego.h
  */
 void juego_liberar(juego_t* juego)
 {

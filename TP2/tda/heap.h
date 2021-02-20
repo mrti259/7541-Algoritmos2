@@ -43,7 +43,7 @@ heap_t* heap_crear(heap_comparador, heap_destructor);
 int heap_insertar(heap_t*, void*);
 
 /**
- * Extrae la raíz. DEvuelve -1 si falló, o 0.
+ * Extrae la raíz. Devuelve -1 si falló, o 0.
  */
 int heap_extraer_raiz(heap_t*);
 

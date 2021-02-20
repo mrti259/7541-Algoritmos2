@@ -5,8 +5,8 @@
 #include <string.h>
 
 const char *ARCHIVO = "datos.tmp",
-    *ESCRIBIR = "w",
-    *LEER = "r";
+      *ESCRIBIR = "w",
+      *LEER = "r";
 
 /**
  * Pruebas de Pokémon.
@@ -42,7 +42,7 @@ void pruebas_pokemon()
     afirmar(pokemon_velocidad(pokemon) == 103, "Tiene 103 de velocidad");
     afirmar(pokemon_tipo_principal(pokemon) == 'A', "El tipo principal es AGUA");
     afirmar(pokemon_tipo_secundario(pokemon) == 'B', "El tipo secundario es BICHO");
-    
+
     char nombre[MAX_NOMBRE];
     pokemon_nombre(pokemon, nombre);
     afirmar(strcmp("Dewpider", nombre) == 0, "Es un Dewpider");
@@ -89,25 +89,25 @@ void pruebas_entrenador()
     afirmar(entrenador != NULL, "Puedo crear un entrenador");
 
     pokemon_t* pokemon = pokemon_crear();
-    afirmar(entrenador_agregar_pokemon(entrenador, pokemon) == 0,
+    afirmar(agregar_pokemon(entrenador, pokemon) == 0,
             "Puedo agregar un pokemon"
-            );
+           );
 
     crear_archivo_pokemon();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_pokemon(archivo, entrenador) == 0,
             "Cargar un pokemon desde un archivo válido devuelve 0"
-            );
+           );
     afirmar(cargar_pokemon(archivo, entrenador) == -1,
             "Si no puede cargar un pokemon devuelve -1"
-            );
+           );
     fclose(archivo);
-    
+
     crear_archivo_pokemon_daniado();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_pokemon(archivo, entrenador) == -1,
             "Cargar un pokemon desde un archivo dañado devuelve -1"
-            );
+           );
     fclose(archivo);
     remove(ARCHIVO);
 
@@ -154,27 +154,31 @@ void pruebas_gimnasio()
     afirmar(gimnasio != NULL, "Puedo crear un gimnasio");
 
     entrenador_t* entrenador = entrenador_crear();
-    afirmar(gimnasio_agregar_entrenador(gimnasio, entrenador) == 0,
+    afirmar(agregar_entrenador(gimnasio, entrenador) == 0,
             "Puedo agregar un entrenador"
-            );
+           );
 
     crear_archivo_entrenador();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_entrenador(archivo, gimnasio) == 0,
             "Cargar un entrenador desde un archivo valido devuelve 0"
-            );
+           );
     afirmar(cargar_entrenador(archivo, gimnasio) == -1,
             "Si no puede cargar un entrenador devuelve -1"
-            );
+           );
     fclose(archivo);
 
     crear_archivo_entrenador_daniado();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_entrenador(archivo, gimnasio) == -1,
             "Cargar un entrenador desde un archivo dañado devuelve -1"
-            );
+           );
     fclose(archivo);
     remove(ARCHIVO);
+
+    afirmar(lista_elementos(gimnasio->entrenadores) == 2,
+            "Hay 2 entrenadores"
+           );
 
     gimnasio_liberar(gimnasio);
 }
@@ -229,44 +233,43 @@ void crear_archivo_gimnasios()
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
     if (archivo)
     {
-        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;3\n");
-        fprintf(archivo, "L;Misty\n");
-        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
-        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
-        fprintf(archivo, "E;Dominguera Diana\n");
-        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
-        fprintf(archivo, "E;Nadador Luis\n");
-        fprintf(archivo, "P;Horsea;A;A;45;30;20\n");
-        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+        fprintf(archivo, "G;Gimnasio de Ciudad Carmín;9;1\n");
+        fprintf(archivo, "L;Lt. Surge\n");
+        fprintf(archivo, "P;Voltorb;E;E;50;40;50\n");
+        fprintf(archivo, "P;Pikachu;E;E;90;50;60\n");
+        fprintf(archivo, "P;Raichu;E;E;90;50;60\n");
+        fprintf(archivo, "E;Marinero Dimas\n");
+        fprintf(archivo, "P;Pikachu;E;E;40;50;30\n");
+        fprintf(archivo, "P;Pikachu;E;E;40;50;30\n");
+        fprintf(archivo, "E;Mecanico Manolo\n");
+        fprintf(archivo, "P;Voltorb;E;E;45;30;20\n");
+        fprintf(archivo, "P;Magnamite;E;I;30;20;45\n");
+        fprintf(archivo, "E;Caballero Tito\n");
+        fprintf(archivo, "P;Pikachu;E;E;45;30;20\n");
 
-        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;3\n");
-        fprintf(archivo, "L;Misty\n");
-        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
-        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
-        fprintf(archivo, "E;Dominguera Diana\n");
-        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
-        fprintf(archivo, "E;Nadador Luis\n");
-        fprintf(archivo, "P;Horsea;A;A;45;30;20\n");
-        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+        fprintf(archivo, "G;Gimnasio de Ciudad Verde;45;3\n");
+        fprintf(archivo, "L;Giovanni\n");
+        fprintf(archivo, "P;Rhyhorn;S;R;50;40;50\n");
+        fprintf(archivo, "P;Dugtrio;T;S;90;50;60\n");
+        fprintf(archivo, "P;Nidoking;T;S;90;50;60\n");
+        fprintf(archivo, "P;Nidoqueen;T;S;90;50;60\n");
+        fprintf(archivo, "P;Rhyhorn;S;R;90;50;60\n");
+        fprintf(archivo, "E;Entrenador Guay Yuji\n"); 
+        fprintf(archivo, "P;Sandlash;S;S;40;50;30\n");
+        fprintf(archivo, "P;Graveler;S;S;40;50;30\n");
+        fprintf(archivo, "P;Onix;S;S;40;50;30\n");
+        fprintf(archivo, "P;Graveler;S;S;40;50;30\n");
+        fprintf(archivo, "P;Marowak;S;S;40;50;30\n");
 
-        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;3\n");
-        fprintf(archivo, "L;Misty\n");
-        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
-        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
-        fprintf(archivo, "E;Dominguera Diana\n");
-        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
-        fprintf(archivo, "E;Nadador Luis\n");
-        fprintf(archivo, "P;Horsea;A;A;45;30;20\n");
-        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+        fprintf(archivo, "G;Gimnasio de Ciudad Plateada;4;2\n");
+        fprintf(archivo, "L;Brock\n");
+        fprintf(archivo, "P;Geodude;R;S;50;40;50\n");
+        fprintf(archivo, "P;Onix;R;S;50;50;60\n");
+        fprintf(archivo, "E;Campista Angelito\n");
+        fprintf(archivo, "P;Godude;R;S;40;50;30\n");
+        fprintf(archivo, "P;Sandshrew;R;S;45;30;20\n");
 
-        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;3\n");
-        fprintf(archivo, "L;Misty\n");
-        fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
-        fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
-        fprintf(archivo, "E;Dominguera Diana\n");
-        fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
-        fprintf(archivo, "E;Nadador Luis\n");
-        fprintf(archivo, "P;Horsedasdasdasdasdjsahdfgashjdfgaksjhdgfhjaksgdfkjhasgdfjkhgdjhfasdgfjhafkjaa;A;A;45;30;20\n");
+        fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;4\n");
         fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
         fclose(archivo);
     }
@@ -332,44 +335,50 @@ void pruebas_juego()
     afirmar(juego != NULL, "Puedo crear un juego");
 
     gimnasio_t* gimnasio = gimnasio_crear();
-    afirmar(juego_agregar_gimnasio(juego, gimnasio) == 0,
+    afirmar(agregar_gimnasio(juego, gimnasio) == 0,
             "Puedo agregar un gimnasio"
-            );
+           );
+    afirmar(juego_gimnasios(juego) == 1,
+            "Tengo un gimnasio cargado"
+           );
 
     crear_archivo_gimnasio();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_gimnasio(archivo, juego) == 0,
             "Cargar un gimnasio desde un archivo valido devuelve 0"
-            );
+           );
     afirmar(cargar_gimnasio(archivo, juego) == -1,
             "Si no puedo cargar un gimnasio devuelve -1"
-            );
+           );
     fclose(archivo);
+    afirmar(juego_gimnasios(juego) == 2,
+            "Cargué 2 gimnasios"
+           );
 
     crear_archivo_gimnasio_daniado();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_gimnasio(archivo, juego) == -1,
-            "Cargar un gimnasio desde un archivo dañado devuelve -0"
-            );
+            "Cargar un gimnasio desde un archivo dañado devuelve -1"
+           );
     fclose(archivo);
 
     crear_archivo_gimnasios();
     afirmar(cargar_gimnasios(ARCHIVO, juego) == 0,
             "Cargar gimnasios desde un archivo valido aunque dañado devuelve 0"
-            );
-    afirmar(juego_gimnasios(juego) == 3,
-            "Se cuenta con 4 Gimnasios"
-            );
+           );
+    afirmar(juego_gimnasios(juego) == 5,
+            "Se cuenta con 5 Gimnasios"
+           );
 
     remove(ARCHIVO);
     afirmar(cargar_gimnasios(ARCHIVO, juego) == -1,
             "Cargar gimnasios sin un archivo devuelve -1"
-            );
+           );
 
     crear_archivo_jugador();
     afirmar(cargar_gimnasios(ARCHIVO, juego) == -1,
             "Cargar gimnasios de un archivo no valido devuelve -1"
-            );
+           );
 
     afirmar(cargar_jugador(ARCHIVO, juego) == 0,
             "Cargar un jugador principal desde un archivo valido devuelve 0"
@@ -388,6 +397,39 @@ void pruebas_juego()
     remove(ARCHIVO);
     afirmar(cargar_jugador(ARCHIVO, juego) == -1,
             "Cargar un jugador principal sin un archivo devuelve -1"
+           );
+
+    afirmar(descartar_gimnasio(juego) == 0,
+            "Puedo eliminar un gimnasio"
+           );
+    afirmar(juego_gimnasios(juego) == 4,
+            "Ahora hay 4 gimnasios"
+           );
+
+    char str[100];
+    gimnasio = gimnasio_actual(juego);
+    entrenador_t* entrenador = rival_actual(juego);
+    pokemon_t* pokemon = pokemon_enemigo(juego);
+
+    gimnasio_nombre(gimnasio, str);
+    afirmar(strcmp(str, "Gimnasio de Ciudad Plateada") == 0,
+            "El gimnasio actual es el Gimnasio de Ciudad Plateada"
+           );
+    afirmar(gimnasio_entrenadores(gimnasio) == 2,
+            "El gimnasio tiene 2 rivales"
+           );
+
+    entrenador_nombre(entrenador, str);
+    afirmar(strcmp(str, "Campista Angelito") == 0,
+            "El primer rival es el Campista Angelito"
+           );
+    afirmar(entrenador_pokemon(entrenador) == 2,
+            "Tiene 2 Pokémon"
+           );
+
+    pokemon_nombre(pokemon, str);
+    afirmar(strcmp(str, "Sandshrew") == 0,
+            "El primer Pokémon rival es Sandshrew"
            );
 
     juego_liberar(juego);

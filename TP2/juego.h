@@ -47,21 +47,9 @@ char pokemon_tipo_secundario(pokemon_t*);
 void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
 
 /**
- * Devuelve un puntero al Pokémon con el que combatirá el entrenador o NULL si
- * falla.
- */
-pokemon_t* entrenador_pokemon_actual(entrenador_t*);
-
-/**
  * Copia el nombre del gimnasio o lo deja en blanco ("") si falla.
  */
 void gimnasio_nombre(gimnasio_t*, char[MAX_NOMBRE]);
-
-/**
- * Devuelve un puntero al rival con el cual debe enfrentarse el jugador
- * actualmente o NULL si falla.
- */
-entrenador_t* gimnasio_rival_actual(gimnasio_t*);
 
 /**
  * Devuelve un puntero a una instancia de juego con sus valores inicializados en
@@ -79,7 +67,22 @@ void juego_liberar(juego_t*);
  * Devuelve un puntero al gimnasio que el jugador debe vencer para avanzar o
  * NULL si no hay gimnasios.
  */
-gimnasio_t* juego_gimnasio_actual(juego_t*);
+gimnasio_t* gimnasio_actual(juego_t*);
+
+/**
+ * Devuelve un puntero al entrenador contra el que se combatirá o NULL.
+ */
+entrenador_t* rival_actual(juego_t*);
+
+/**
+ * Devuelve un puntero al Pokémon contra el que se combatirá o NULL.
+ */
+pokemon_t* pokemon_enemigo(juego_t*);
+
+/**
+ * Devuelve un puntero al jugador o NULL.
+ */
+entrenador_t* personaje_principal(juego_t*);
 
 /**
  * Carga informacion de gimnasios, entrenadores y pokemon de un archivo al

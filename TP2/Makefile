@@ -5,7 +5,7 @@ VFLAGS=--leak-check=full --track-origins=yes --show-reachable=yes
 EXEC=juego.bin
 
 lint:
-	cppcheck --enable=all ../*.c
+	cppcheck --enable=all *.c
 
 build:
 	$(CC) $(CFLAGS) $(EXEC) tda/*.c juego.c inicio.c

@@ -4,9 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const char *ARCHIVO = "datos.tmp",
-      *ESCRIBIR = "w",
-      *LEER = "r";
+const char *ARCHIVO = "datos.tmp", *ESCRIBIR = "w", *LEER = "r";
 
 /**
  * Pruebas de Pokémon.
@@ -372,6 +370,9 @@ void pruebas_juego()
 
     remove(ARCHIVO);
     afirmar(cargar_gimnasios(ARCHIVO, juego) == -1,
+            "Cargar gimnasios con un archivo inexistente devuelve -1"
+           );
+    afirmar(cargar_gimnasios("", juego) == -1,
             "Cargar gimnasios sin un archivo devuelve -1"
            );
 
@@ -396,6 +397,9 @@ void pruebas_juego()
 
     remove(ARCHIVO);
     afirmar(cargar_jugador(ARCHIVO, juego) == -1,
+            "Cargar un jugador principal con un archivo inexistente devuelve -1"
+           );
+    afirmar(cargar_jugador("", juego) == -1,
             "Cargar un jugador principal sin un archivo devuelve -1"
            );
 
@@ -406,7 +410,7 @@ void pruebas_juego()
             "Ahora hay 4 gimnasios"
            );
 
-    char str[100];
+    char str[MAX_NOMBRE];
     gimnasio = gimnasio_actual(juego);
     entrenador_t* entrenador = rival_actual(juego);
     pokemon_t* pokemon = pokemon_enemigo(juego);
@@ -498,6 +502,24 @@ void pruebas_batallas()
     pokemon_liberar(pkm_2);
 }
 
+/**
+ * Pruebas de Jugabilidad.
+ * Verifica que las funciones que permiten la jugabilidad funcionan correctamente.
+ */
+void pruebas_jugabilidad()
+{
+    juego_t* juego = juego_crear();
+    crear_archivo_jugador();
+    cargar_jugador(ARCHIVO, juego);
+    crear_archivo_gimnasios();
+    cargar_gimnasios(ARCHIVO, juego);
+    remove(ARCHIVO);
+
+    
+    
+    juego_liberar(juego);
+}
+
 void ejecutar_pruebas()
 {
     pruebas_pokemon();
@@ -505,6 +527,7 @@ void ejecutar_pruebas()
     pruebas_gimnasio();
     pruebas_juego();
     pruebas_batallas();
+    pruebas_jugabilidad();
 }
 
 int main()

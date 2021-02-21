@@ -4,8 +4,9 @@ VAL=valgrind
 VFLAGS=--leak-check=full --track-origins=yes --show-reachable=yes
 EXEC=pruebas.bin
 
-lint:
-	cppcheck --enable=all ../*.c
+juego:
+	$(CC) $(CFLAGS) $(EXEC) juego_pruebas.c ../tda/heap.c ../tda/lista.c ../batallas.c
+	$(VAL) $(VFLAGS) ./$(EXEC)
 
 heap:
 	$(CC) $(CFLAGS) $(EXEC) heap_pruebas.c ../tda/heap.c
@@ -19,9 +20,8 @@ lista:
 	$(CC) $(CFLAGS) $(EXEC) lista_pruebas.c ../tda/lista.c
 	$(VAL) $(VFLAGS) ./$(EXEC)
 
-juego:
-	$(CC) $(CFLAGS) $(EXEC) juego_pruebas.c ../tda/heap.c ../tda/lista.c ../batallas.c
-	$(VAL) $(VFLAGS) ./$(EXEC)
+lint:
+	cppcheck --enable=all ../*.c
 
 clean:
 	rm *.bin

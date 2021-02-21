@@ -85,6 +85,11 @@ pokemon_t* pokemon_enemigo(juego_t*);
 entrenador_t* personaje_principal(juego_t*);
 
 /**
+ * Devuleve un puntero al Pokemon del jugador o NULL.
+ */
+pokemon_t* pokemon_jugador(juego_t*);
+
+/**
  * Carga informacion de gimnasios, entrenadores y pokemon de un archivo al
  * juego.
  *

@@ -168,6 +168,31 @@ int agregar_a_party(entrenador_t* entrenador, pokemon_t* pokemon)
 }
 
 /**
+ * Devuelve 0 si se puede quitar al Pokémon del party.
+ */
+int quitar_del_party(entrenador_t* entrenador, pokemon_t* pokemon)
+{
+    if (!entrenador || !pokemon)
+    {
+        return ERROR;
+    }
+
+    pokemon_t* tope = lista_tope(entrenador->pkm_party);
+    lista_desapilar(entrenador->pkm_party);
+
+    if (pokemon == tope)
+    {
+        return SIN_ERROR;
+    }
+
+    bool err = quitar_del_party(entrenador, pokemon);
+
+    lista_apilar(entrenador->pkm_party, tope);
+
+    return err;
+}
+
+/**
  * Devuelve 0 si se puede agregar el pokemon a la lista de pokemon obtenidos del
  * entrenador.
  */
@@ -238,7 +263,7 @@ void entrenador_liberar(entrenador_t* entrenador)
 
     while (entrenador_pokemon(entrenador) > 0)
     {
-        pokemon = lista_primero(entrenador->pkm_obtenidos);
+        pokemon = lista_tope(entrenador->pkm_obtenidos);
         lista_borrar_de_posicion(entrenador->pkm_obtenidos, 0);
         pokemon_liberar(pokemon);
     }
@@ -460,7 +485,7 @@ entrenador_t* rival_actual(juego_t* juego)
 {
     gimnasio_t* gimnasio = gimnasio_actual(juego);
 
-    return gimnasio ? lista_primero(gimnasio->entrenadores) : NULL;
+    return gimnasio ? lista_tope(gimnasio->entrenadores) : NULL;
 }
 
 /**
@@ -471,6 +496,24 @@ pokemon_t* pokemon_enemigo(juego_t* juego)
     entrenador_t* rival = rival_actual(juego);
 
     return rival ? lista_tope(rival->pkm_party) : NULL;
+}
+
+/**
+ * Definido en juego.h
+ */
+entrenador_t* personaje_principal(juego_t* juego)
+{
+    return juego ? juego->jugador : NULL;
+}
+
+/**
+ * Definido en juego.h
+ */
+pokemon_t* pokemon_jugador(juego_t* juego)
+{
+    entrenador_t* jugador = personaje_principal(juego);
+
+    return jugador ? lista_tope(jugador->pkm_party) : NULL;
 }
 
 /*******************************************************************************

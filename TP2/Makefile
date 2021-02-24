@@ -6,13 +6,16 @@ EXEC = juego.bin
 CFILES = tda/*.c juego.c inicio.c
 DIRS = datos/jugador datos/gimnasios
 
-all: build dirs
+all: build dirs play
 
 build:
 	$(CC) $(CFLAGS) $(EXEC) tda/*.c juego.c inicio.c
 
 dirs:
 	mkdir -p $(DIRS)
+
+play:
+	./$(EXEC)
 
 test: build
 	$(VAL) $(VFLAGS) ./$(EXEC)

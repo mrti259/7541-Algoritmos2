@@ -9,15 +9,20 @@ enum tipos_pokemon
 {
     AGUA = 'A' ,
     BICHO = 'B' ,
+    ACERO = 'C' ,
     DRAGON = 'D' ,
     ELECTRICO = 'E' ,
     FUEGO = 'F' ,
     FANTASMA = 'G' ,
     HOJA = 'H' ,
+    HIELO = 'I',
     LUCHA = 'L' ,
+    MAGICO = 'M' ,
     NORMAL = 'N' ,
+    SINIESTRO = 'O' ,
     PSIQUICO = 'P' , 
     ROCA = 'R' ,
+    TIERRA = 'S' ,
     TOXICO = 'T' ,
     VUELO = 'V'
 };
@@ -27,7 +32,7 @@ enum tipos_pokemon
  */
 int funcion_batalla_1(void* pkm_1, void* pkm_2)
 {
-    pokemon_t *p_1 = (pokemon_t*) pkm_1, *p_2 = (pokemon_t*) pkm_2;
+    pokemon_t *p_1 = pkm_1, *p_2 = pkm_2;
 
     int ataque_1 = pokemon_ataque(p_1) ,
         defensa_1 = pokemon_defensa(p_1) ,
@@ -52,7 +57,7 @@ int funcion_batalla_1(void* pkm_1, void* pkm_2)
  */
 int funcion_batalla_2(void* pkm_1, void* pkm_2)
 {
-    pokemon_t *p_1 = (pokemon_t*) pkm_1, *p_2 = (pokemon_t*) pkm_2;
+    pokemon_t *p_1 = pkm_1, *p_2 = pkm_2;
 
     int velocidad_1 = pokemon_velocidad(p_1), velocidad_2 = pokemon_velocidad(p_2);
 
@@ -64,7 +69,7 @@ int funcion_batalla_2(void* pkm_1, void* pkm_2)
  */
 int funcion_batalla_3(void* pkm_1, void* pkm_2)
 {
-    pokemon_t *p_1 = (pokemon_t*) pkm_1, *p_2 = (pokemon_t*) pkm_2;
+    pokemon_t *p_1 = pkm_1, *p_2 = pkm_2;
 
     int ataque_1 = pokemon_ataque(p_1) ,
         defensa_1 = pokemon_defensa(p_1) ,
@@ -83,12 +88,8 @@ int funcion_batalla_3(void* pkm_1, void* pkm_2)
     {
         pts_1++;
     }
-
     // Gana el más gordito -> mayor defensa
-    if (defensa_1 > defensa_2)
-    {
-        pts_1++;
-    }
+    defensa_1 > defensa_2 ? pts_1++ : 0;
 
     return pts_1 > 0 ? GANO_PRIMERO : GANO_SEGUNDO;
 }
@@ -100,24 +101,28 @@ int rareza(char tipo)
 {
     switch (tipo)
     {
-        case DRAGON:
+        case ELECTRICO:
+        case SINIESTRO:
+            return 12;
         case FANTASMA:
         case PSIQUICO:
+            return 10;
+        case DRAGON:
+        case MAGICO:
+        case TOXICO:
             return 8;
+        case ACERO:
+        case BICHO:
         case FUEGO:
         case LUCHA:
-        case TOXICO:
+        case VUELO:
             return 6;
         case AGUA:
-        case ELECTRICO:
         case HOJA:
-            return 4;
-        case BICHO:
         case ROCA:
-        case VUELO:
-            return 2;
+            return 4;
         default:
-            return 0;
+            return 2;
     }
 }
 
@@ -126,7 +131,7 @@ int rareza(char tipo)
  */
 int funcion_batalla_4(void* pkm_1, void* pkm_2)
 {
-    pokemon_t *p_1 = (pokemon_t*) pkm_1, *p_2 = (pokemon_t*) pkm_2;
+    pokemon_t *p_1 = pkm_1, *p_2 = pkm_2;
 
     char tipo_1_a = pokemon_tipo_principal(p_1) ,
          tipo_1_b = pokemon_tipo_secundario(p_1) ,
@@ -135,7 +140,7 @@ int funcion_batalla_4(void* pkm_1, void* pkm_2)
 
     int rareza_1 = rareza(tipo_1_a) + rareza(tipo_1_b) / 2 ,
         rareza_2 = rareza(tipo_2_a) + rareza(tipo_2_b) / 2 ;
-    
+
     return rareza_1 > rareza_2 ? GANO_PRIMERO : GANO_SEGUNDO;
 }
 
@@ -144,11 +149,11 @@ int funcion_batalla_4(void* pkm_1, void* pkm_2)
  */
 int funcion_batalla_5(void* pkm_1, void* pkm_2)
 {
-    pokemon_t *p_1 = (pokemon_t*) pkm_1, *p_2 = (pokemon_t*) pkm_2;
+    pokemon_t *p_1 = pkm_1, *p_2 = pkm_2;
 
     int pts_1 = 0;
-    
-    char nombre_1[MAX_NOMBRE], nombre_2[MAX_NOMBRE];
+
+    char nombre_1[MAX_NOMBRE] = "", nombre_2[MAX_NOMBRE] = "";
     pokemon_nombre(p_1, nombre_1);
     pokemon_nombre(p_2, nombre_2);
 
@@ -163,7 +168,7 @@ int funcion_batalla_5(void* pkm_1, void* pkm_2)
     {
         pts_1++;
     }
-    
+
     // Gana si resiste los beef de su oponente
     if (pokemon_defensa(p_1) > pokemon_ataque(p_2))
     {

@@ -56,7 +56,7 @@ void crear_archivo_pokemon()
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
     if (archivo)
     {
-        fprintf(archivo, ";Goldeen;A;A;40;50;30\n");
+        fprintf(archivo, ";Goldeen;A;A;40;50; 30\n"); // A pesar de los espacios debe tomarse como válido
         fclose(archivo);
     }
 }
@@ -69,7 +69,7 @@ void crear_archivo_pokemon_daniado()
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
     if (archivo)
     {
-        fprintf(archivo, ";Goldeesdasdasdasdasdasjdhasdhaskjdfhlksahdlkjfsajdkfjakshdkjsahdklashdjkashdlkasjhdkjlshdklahsjdlkahjsdakjsdhalkdhsakjshdaklhsdkajshdkalhsdklahsdklahsdkjahsdkjlhsadlkahsdkajksadhflhasdn;A;A;40;50;30\n");
+        fprintf(archivo, ";Goldeesdasdasdasdasdasjdhasdhaskjdfhlksahdlkjfsajdkfjakshdkjsahdklashdjkashdlkasjhdkjlshdklahsjdlkahjsdakjsdhalkdhsakjshdaklhsdkajshdkalhsdklahsdklahsdkjahsdkjlhsadlkahsdkajksadhflhasdn;A;A;40;50;30\n"); // Overflow!
         fclose(archivo);
     }
 }
@@ -138,7 +138,7 @@ void crear_archivo_entrenador()
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
     if (archivo)
     {
-        fprintf(archivo, ";Dominguera Diana\n");
+        fprintf(archivo, "; Dominguera Diana\n");
         fprintf(archivo, "P;Goldeen;A;A;40;50;30\n");
         fclose(archivo);
     }
@@ -227,7 +227,7 @@ void crear_archivo_gimnasio()
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
     if (archivo)
     {
-        fprintf(archivo, ";Gimnasio de Ciudad Celeste;15;3\n");
+        fprintf(archivo, ";Gimnasio de Ciudad Celeste; 15; 3\n");
         fprintf(archivo, "L;Misty\n");
         fprintf(archivo, "P;Staryu;A;A;50;40;50\n");
         fprintf(archivo, "P;Starmie;A;A;90;50;60\n");
@@ -283,7 +283,7 @@ void crear_archivo_gimnasios()
         fprintf(archivo, "E;Caballero Tito\n");
         fprintf(archivo, "P;Pikachu;E;E;45;30;20\n");
 
-        fprintf(archivo, "G;Gimnasio de Ciudad Verde;45;3\n");
+        fprintf(archivo, "G;Gimnasio de Ciudad Verde; 45; 3\n");
         fprintf(archivo, "L;Giovanni\n");
         fprintf(archivo, "P;Rhyhorn;S;R;50;40;50\n");
         fprintf(archivo, "P;Dugtrio;T;S;90;50;60\n");
@@ -297,16 +297,16 @@ void crear_archivo_gimnasios()
         fprintf(archivo, "P;Graveler;S;S;40;50;30\n");
         fprintf(archivo, "P;Marowak;S;S;40;50;30\n");
 
-        fprintf(archivo, "G;Gimnasio de Ciudad Plateada;4;2\n");
-        fprintf(archivo, "L;Brock\n");
+        fprintf(archivo, "\nG;Gimnasio de Ciudad Plateada;4;2\n"); // A pesar de las lineas se toma como válido
+        fprintf(archivo, "\nL;Brock\n");
         fprintf(archivo, "P;Geodude;R;S;50;40;50\n");
-        fprintf(archivo, "P;Onix;R;S;50;50;60\n");
+        fprintf(archivo, "\nP;Onix;R;S;50;50;60\n");
         fprintf(archivo, "E;Campista Angelito\n");
         fprintf(archivo, "P;Geodude;R;S;40;50;30\n");
         fprintf(archivo, "P;Sandshrew;R;S;45;30;20\n");
 
         fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;4\n");
-        fprintf(archivo, "P;Shellder;A;A;30;20;45\n");
+        fprintf(archivo, "P;Shellder;A;A;30;20;45\n"); // No tiene Lider por lo cual debe cancelarse
         fclose(archivo);
     }
 }
@@ -571,37 +571,6 @@ void pruebas_batallas()
             "Funcion batalla 5: Gana segundo"
            );
 
-    afirmar(funcion_batalla_1(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 1: Gana primero"
-           );
-    afirmar(funcion_batalla_1(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 1: Gana segundo"
-           );
-    afirmar(funcion_batalla_2(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 2: Gana primero"
-           );
-    afirmar(funcion_batalla_2(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 2: Gana segundo"
-           );
-    afirmar(funcion_batalla_3(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 3: Gana primero"
-           );
-    afirmar(funcion_batalla_3(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 3: Gana segundo"
-           );
-    afirmar(funcion_batalla_4(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 4: Gana primero"
-           );
-    afirmar(funcion_batalla_4(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 4: Gana segundo"
-           );
-    afirmar(funcion_batalla_5(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 1: Gana primero"
-           );
-    afirmar(funcion_batalla_5(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 1: Gana segundo"
-           );
-
     pokemon_liberar(pkm_1);
     pokemon_liberar(pkm_2);
 }
@@ -633,31 +602,33 @@ void pruebas_jugabilidad()
      * retar gimnasio -> flujo
      */
 
-    pokemon_t* pokemon = pokemon_jugador(juego);
-    int ataque = pokemon_ataque(pokemon);
-    pokemon_nombre(pokemon, str);
+    pokemon_t *pkm_jugador = pokemon_jugador(juego), 
+              *pkm_enemigo = pokemon_enemigo(juego);
+    int ataque = pokemon_ataque(pkm_jugador);
+    pokemon_nombre(pkm_jugador, str);
+    
     afirmar(strcmp(str, "Pikachu") == 0,
             "El Pokemon actual es Pikachu"
            );
-    afirmar(retar_pokemon(juego) == 1,
+    afirmar(combate_pokemon(pkm_jugador, pkm_enemigo, 1) == 1,
             "Gano la primera pelea"
             );
-    afirmar(pokemon_ataque(pokemon) == ataque + 1,
+    afirmar(pokemon_ataque(pkm_jugador) == ataque + 1,
             "El ataque de mi Pokémon aumentó en 1"
             );
 
-    afirmar(retar_entrenador(juego) == 1,
+    afirmar(combate_entrenadores(personaje_principal(juego), rival_actual(juego), 1) == 1,
             "Le gano al primer entrenador"
             );
 
-    afirmar(retar_pokemon(juego) == -1,
+    afirmar(combate_pokemon(pokemon_jugador(juego), pokemon_enemigo(juego), 1) == -1,
             "Pierdo la primera pelea"
             );
     pokemon_nombre(pokemon_jugador(juego), str);
     afirmar(strcmp(str, "Butterfree") == 0,
             "El Pokemon actual es Butterfree"
            );
-    afirmar(retar_pokemon(juego) == 1,
+    afirmar(combate_entrenadores(personaje_principal(juego), rival_actual(juego), 1) == 1,
             "Gano la segunda pelea"
             );
     pokemon_nombre(pokemon_jugador(juego), str);
@@ -710,6 +681,73 @@ void pruebas_jugabilidad()
     juego_liberar(juego);
 }
 
+/**
+ * Para probar aquellas funciones publicas de juego.h
+ */
+void pruebas_con_null()
+{
+    nuevo_grupo("Pruebas con NULL");
+    pokemon_t *pkm_1 = pokemon_crear(),
+              *pkm_2 = pokemon_crear();
+
+    if (pkm_1 && pkm_2)
+    {
+        pkm_1->ataque = 100;
+        pkm_1->defensa = 80;
+        pkm_1->velocidad = 100;
+        pkm_1->adicional = 20;
+        pkm_1->tipo_1 = 'F';
+        pkm_1->tipo_2 = 'V';
+        strcpy(pkm_1->nombre, "Charizard");
+
+        pkm_2->ataque = 70;
+        pkm_2->defensa = 56;
+        pkm_2->velocidad = 88;
+        pkm_2->adicional = 0;
+        pkm_2->tipo_1 = 'V';
+        pkm_2->tipo_2 = 'N';
+        strcpy(pkm_2->nombre, "Pidgeotto");
+    }
+ 
+    afirmar(funcion_batalla_1(pkm_2, NULL) == GANO_PRIMERO,
+            "Funcion batalla 1: Gana primero"
+           );
+    afirmar(funcion_batalla_1(NULL, pkm_2) == GANO_SEGUNDO,
+            "Funcion batalla 1: Gana segundo"
+           );
+    afirmar(funcion_batalla_2(pkm_2, NULL) == GANO_PRIMERO,
+            "Funcion batalla 2: Gana primero"
+           );
+    afirmar(funcion_batalla_2(NULL, pkm_2) == GANO_SEGUNDO,
+            "Funcion batalla 2: Gana segundo"
+           );
+    afirmar(funcion_batalla_3(pkm_2, NULL) == GANO_PRIMERO,
+            "Funcion batalla 3: Gana primero"
+           );
+    afirmar(funcion_batalla_3(NULL, pkm_2) == GANO_SEGUNDO,
+            "Funcion batalla 3: Gana segundo"
+           );
+    afirmar(funcion_batalla_4(pkm_2, NULL) == GANO_PRIMERO,
+            "Funcion batalla 4: Gana primero"
+           );
+    afirmar(funcion_batalla_4(NULL, pkm_2) == GANO_SEGUNDO,
+            "Funcion batalla 4: Gana segundo"
+           );
+    afirmar(funcion_batalla_5(pkm_2, NULL) == GANO_PRIMERO,
+            "Funcion batalla 1: Gana primero"
+           );
+    afirmar(funcion_batalla_5(NULL, pkm_2) == GANO_SEGUNDO,
+            "Funcion batalla 1: Gana segundo"
+           );
+
+    /**
+     * agregar todas las funciones de juego.h
+     */
+
+    pokemon_liberar(pkm_1);
+    pokemon_liberar(pkm_2);
+}
+
 void ejecutar_pruebas()
 {
     pruebas_pokemon();
@@ -719,6 +757,7 @@ void ejecutar_pruebas()
     pruebas_batallas();
     pruebas_guardado();
     pruebas_jugabilidad();
+    pruebas_con_null();
 }
 
 int main()

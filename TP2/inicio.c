@@ -38,7 +38,16 @@ enum teclas
     FINALIZAR_PARTIDA = 'F'
 };
 
-void menu_inicio(juego_t*);
+enum menus
+{
+    I_INICIO,
+    I_GIMNASIO,
+    I_BATALLA,
+    I_VICTORIA,
+    I_DERROTA
+};
+
+void controller(int, juego_t*);
 
 int main(int argc,char** argv)
 {
@@ -47,7 +56,7 @@ int main(int argc,char** argv)
     if (!juego)
         return -1;
 
-    menu_inicio(juego);
+    controller(I_INICIO, juego);
 
     juego_liberar(juego);
 
@@ -68,7 +77,7 @@ char pedir_tecla(bool es_valido(char))
     char opcion[] = " ";
 
     printf(PEDIR);
-    scanf(" %c", opcion);
+    scanf("%1s", opcion);
 
     return es_valido(*opcion) ? *opcion : pedir_tecla(es_valido);
 }
@@ -99,7 +108,7 @@ void mostrar_archivos(char directorio[MAX_NOMBRE])
         if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
         {
             i++;
-            printf(ARCHIVO_FORMATO, ent->d_name);
+            printf("|" ARCHIVO_FORMATO " |", ent->d_name);
             if (i % 3 == 0) printf("\n");
         }
     }
@@ -145,7 +154,8 @@ void pantalla_cargar_jugador(juego_t* juego)
     {
         printf("| No se pudo abrir el archivo.\n");
 
-        printf("| Quiere crear una nueva partida?\n");
+        printf("| Quiere crear una nueva partida? (%c para confirmar / %c para cancelar)\n"
+                , SI, NO);
         
         if (pedir_tecla(confirmacion) == SI)
         {
@@ -160,7 +170,7 @@ void pantalla_cargar_jugador(juego_t* juego)
  */
 void pantalla_agregar_gimnasios(juego_t* juego)
 {
-    char ruta[MAX_RUTA];
+    char ruta[MAX_RUTA] = ORIGEN_GIMNASIOS;
     char archivo[MAX_ARCHIVO];
 
     mostrar_archivos(ruta);
@@ -217,7 +227,15 @@ void pantalla_gimnasio(juego_t* juego)
     gimnasio_t *gimnasio = gimnasio_actual(juego);
 
     gimnasio_nombre(gimnasio, str);
-    printf("| Estas en el Gimnasio %s\n|\n|\n|\n", str); 
+    printf("|\n| Estas en el Gimnasio %s\n", str); 
+    printf("| Quedan %i entrenadores\n", (int) gimnasio_entrenadores(gimnasio));
+
+    entrenador_t* rival = rival_actual(juego);
+    entrenador_nombre(rival, str);
+    printf("|\n| El próximo rival es %s\n", str);
+    pokemon_nombre(pokemon_enemigo(juego), str);
+    printf("| Cuenta con %i Pokémon. Su próximo Pokémon es %s\n"
+            , (int) entrenador_party(rival), str);
 }
 
 /**
@@ -301,14 +319,14 @@ void menu_inicio_accionar(char opcion, juego_t* juego)
     {
         case CARGAR_JUGADOR:
             pantalla_cargar_jugador(juego);
-            menu_inicio(juego);
+            controller(I_INICIO, juego);
             return;
         case AGREGAR_GIMNASIOS:
             pantalla_agregar_gimnasios(juego);
-            menu_inicio(juego);
+            controller(I_INICIO, juego);
             return;
         case COMENZAR_PARTIDA:
-            pantalla_partida(juego);//, AVENTURA);
+            controller(I_GIMNASIO, juego);//, AVENTURA);
             return;
         case SIMULAR_PARTIDA:
             pantalla_partida(juego);//, SIMULACION);
@@ -321,7 +339,8 @@ void menu_inicio_accionar(char opcion, juego_t* juego)
  */
 void menu_inicio(juego_t* juego)
 {
-    char nombre[MAX_NOMBRE], str[MAX_NOMBRE + 4] = ", ";
+    char nombre[MAX_NOMBRE] = "",
+         str[MAX_NOMBRE + 4] = ", ";
     entrenador_nombre(personaje_principal(juego), nombre);
     int cargados = (int) juego_gimnasios(juego);
 
@@ -402,6 +421,8 @@ void menu_gimnasio_accionar(char opcion, juego_t* juego)
  */
 void menu_gimnasio(juego_t* juego)
 {
+    pantalla_gimnasio(juego);
+
     printf("|\n| ¿Que desea hacer?\n");
     printf("| %c - Ver mi equipo\n", VER_EQUIPO);
     printf("| %c - Ver información del gimnasio actual\n", VER_GIMNASIO);
@@ -449,7 +470,13 @@ void menu_batalla_accionar(char opcion, juego_t* juego)
  */
 void menu_batalla(juego_t* juego)
 {
-    pokemon_t* mi_pkm = 
+    pokemon_t *mi_pkm = pokemon_jugador(juego),
+              *otro_pkm = pokemon_enemigo(juego);
+    char nombre_1[MAX_NOMBRE], nombre_2[MAX_NOMBRE];
+
+    pokemon_nombre(mi_pkm, nombre_1);
+    pokemon_nombre(otro_pkm, nombre_2);
+    printf("| %s va a enfrentarse con %s\n", nombre_1, nombre_2);
 
     printf("|\n| ¿Que desea hacer?\n");
     printf("| %c - Pelear!\n", SIGUIENTE);
@@ -551,4 +578,21 @@ void menu_derrota(juego_t* juego)
     printf("| %c - Finalizar partida\n", FINALIZAR_PARTIDA);
 
     menu_derrota_accionar(pedir_tecla(menu_derrota_opcion_valido), juego);
+}
+
+/**
+ * Recibe una instancia de juego creada y un numero i_menu que representa
+ * el indice del menu que se desea mostrar.
+ */
+void controller(int i_menu, juego_t* juego)
+{
+    void (*menus[])(juego_t*) = {
+        menu_inicio,
+        menu_gimnasio,
+        menu_batalla,
+        menu_victoria,
+        menu_derrota
+    };
+
+    menus[i_menu](juego);
 }

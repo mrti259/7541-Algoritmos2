@@ -44,6 +44,11 @@ char pokemon_tipo_principal(pokemon_t*);
 char pokemon_tipo_secundario(pokemon_t*);
 
 /**
+ *
+ */
+size_t entrenador_party(entrenador_t*);
+
+/**
  * Copia el nombre del entrenador o lo deja en blanco ("") si falla.
  */
 void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
@@ -56,7 +61,7 @@ void gimnasio_nombre(gimnasio_t*, char[MAX_NOMBRE]);
 /**
  *
  */
-void gimnasio_mostrar_entrenadores(gimnasio_t*, void* mostrar(entrenador_t*));
+size_t gimnasio_entrenadores(gimnasio_t*);
 
 /**
  * Devuelve un puntero a una instancia de juego con sus valores inicializados en

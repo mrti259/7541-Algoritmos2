@@ -1,5 +1,4 @@
 #include "constantes.h"
-#include "batallas.h"
 #include "juego.h"
 #include "tda/heap.h"
 #include "tda/lista.h"
@@ -27,8 +26,7 @@ struct pokemon
 const int POKEMON_MAX_ADICIONAL = 63;
 
 /**
- * Devuelve un puntero a un pokemon en el heap con sus valores inicializados en
- * 0 o NULL. Si falla devuelve NULL.
+ * Reserva la memoria para un Pokémon y devuelve su puntero. Si falla devuelve NULL.
  */
 pokemon_t* pokemon_crear()
 {
@@ -36,7 +34,7 @@ pokemon_t* pokemon_crear()
 }
 
 /**
- * Libera el espacio reservado en heap para el pokemon. Si pokemon es NULL no
+ * Libera el espacio reservado en heap para el Pokémon. Si Pokémon es NULL no
  * hace nada.
  */
 void pokemon_liberar(pokemon_t* pokemon)
@@ -45,7 +43,7 @@ void pokemon_liberar(pokemon_t* pokemon)
 }
 
 /**
- * Devuelve true si el pokemon puede aumentar sus estadisticas de combate en 1.
+ * Devuelve true si el Pokémon puede aumentar sus estadisticas de combate en 1.
  */
 bool pokemon_puede_subir_estadisticas(pokemon_t* pokemon)
 {
@@ -121,14 +119,17 @@ void pokemon_nombre(pokemon_t* pokemon, char nombre[MAX_NOMBRE])
 struct entrenador
 {
     char nombre[MAX_NOMBRE];
-    lista_t* pkm_party; // lista de pokemon que lo acompanan
+    lista_t* pkm_party; // lista de pokémon que lo acompanan
     lista_t* pkm_obtenidos; // lista de todos sus pokemon
+    size_t pkm_actual; // posición del pokémon que puede combatir
 };
 
 const int ENTRENADOR_TOPE_PARTY = 6;
 
 /**
- * Devuelve un puntero a un entrenador creado en el heap, sin nombre ni pokemon.
+ * Reserva memoria para un entrenador y devuelve su puntero.  No tiene ni
+ * nombre ni Pokémon pero se crean las listas de party y Pokémon
+ * obtenidos.
  */
 entrenador_t* entrenador_crear()
 {
@@ -151,7 +152,7 @@ entrenador_t* entrenador_crear()
 }
 
 /**
- * Devuelve la cantidad de pokemon que tiene el entrenador en su party.
+ * Definido en juego.h
  */
 size_t entrenador_party(entrenador_t* entrenador)
 {
@@ -159,7 +160,34 @@ size_t entrenador_party(entrenador_t* entrenador)
 }
 
 /**
- * Devuelve true si el entrenador tiene espacio en el party para un pokemon mas.
+ * Devuelve la cantidad de Pokémon que tiene el entrenador.
+ */
+size_t entrenador_pokemon_obtenidos(entrenador_t* entrenador)
+{
+    return entrenador ? lista_elementos(entrenador->pkm_obtenidos) : 0;
+}
+
+/**
+ * Definido en juego.h
+ */
+size_t entrenador_pokemon_restante(entrenador_t* entrenador)
+{
+    return entrenador ?
+        entrenador_party(entrenador) - entrenador->pkm_actual : 0;
+}
+
+/**
+ * Devuelve el Pokémon con el que combatirá el entrenador.
+ */
+pokemon_t* entrenador_pokemon_actual(entrenador_t* entrenador)
+{
+    return entrenador ?
+        lista_elemento_en_posicion(entrenador->pkm_party, entrenador->pkm_actual) : NULL;
+}
+
+/**
+ * Devuelve true si el entrenador tiene espacio en el party para un Pokémon
+ * mas.
  */
 bool entrenador_party_con_espacio(entrenador_t* entrenador)
 {
@@ -167,7 +195,7 @@ bool entrenador_party_con_espacio(entrenador_t* entrenador)
 }
 
 /**
- * Devuelve 0 si se puede agregar el pokemon al party del entrenador.
+ * Devuelve 0 si se agrega el Pokémon al party del entrenador.
  */
 int entrenador_agregar_a_party(entrenador_t* entrenador, pokemon_t* pokemon)
 {
@@ -255,17 +283,10 @@ int entrenador_agregar_pokemon(entrenador_t* entrenador, pokemon_t* pokemon)
 }
 
 /**
- * Devuelve la cantidad de pokemon que tiene el entrenador.
+ * Recorre una lista de Pokémon y las muestra. Los parámetros no pueden ser
+ * NULL.
  */
-size_t entrenador_pokemon(entrenador_t* entrenador)
-{
-    return entrenador ? lista_elementos(entrenador->pkm_obtenidos) : 0;
-}
-
-/**
- *
- */
-void entrenador_recorrer_pokemon(lista_t* pkm, void* mostrar(pokemon_t*))
+void entrenador_recorrer_pokemon(lista_t* pkm, void (*mostrar)(pokemon_t*))
 {
     lista_iterador_t* iterador = lista_iterador_crear(pkm);
     while (lista_iterador_tiene_siguiente(iterador))
@@ -277,11 +298,11 @@ void entrenador_recorrer_pokemon(lista_t* pkm, void* mostrar(pokemon_t*))
 }
 
 /**
- * Muestra los Pokemon del entrenador en el Party.
+ * Definido en juego.h
  */
-void entrenador_mostrar_party(entrenador_t* entrenador, void* mostrar(pokemon_t*))
+void entrenador_mostrar_party(entrenador_t* entrenador, void (*mostrar)(pokemon_t*))
 {
-    if (!entrenador || !mostrar || !entrenador->pkm_party)
+    if (!entrenador || !entrenador->pkm_party || !mostrar)
     {
         return;
     }
@@ -290,9 +311,9 @@ void entrenador_mostrar_party(entrenador_t* entrenador, void* mostrar(pokemon_t*
 }
 
 /**
- * Muestra los Pokemon del entrenador,
+ * Definido en juego.h
  */
-void entrenador_mostrar_pokemon(entrenador_t* entrenador, void* mostrar(pokemon_t*))
+void entrenador_mostrar_pokemon(entrenador_t* entrenador, void (*mostrar)(pokemon_t*))
 {
     if (!entrenador || !mostrar || !entrenador->pkm_obtenidos)
     {
@@ -311,7 +332,8 @@ void entrenador_nombre(entrenador_t* entrenador, char nombre[MAX_NOMBRE])
 }
 
 /**
- * Libera la memoria reservada para el entrenador, incluyendo sus pokemon.
+ * Libera la memoria reservada para el entrenador y los Pokémon que le
+ * pertenezcan.
  */
 void entrenador_liberar(entrenador_t* entrenador)
 {
@@ -346,18 +368,9 @@ struct gimnasio
     bool derrotado;
 };
 
-int (*funciones_batalla[])(void*, void*) = {
-    funcion_batalla_1,
-    funcion_batalla_2,
-    funcion_batalla_3,
-    funcion_batalla_4,
-    funcion_batalla_5
-};
-
-const int MIN_FUNCIONES = 0, MAX_FUNCIONES = 5;
-
 /**
- * Devuelve un puntero a un gimnasio creado en el heap o NULL.
+ * Reserva la memoria para un gimnasio y su pila de entenadores vacía.
+ * Devuelve su puntero. Si falla devuelve NULL.
  */
 gimnasio_t* gimnasio_crear()
 {
@@ -390,11 +403,34 @@ int gimnasio_agregar_entrenador(gimnasio_t* gimnasio, entrenador_t* entrenador)
 }
 
 /**
- * Devuelve la cantidad de entrenadores que hay en el gimnasio.
+ * Devuelve 0 si se borra correctamente un entrenador.
+ */
+int gimnasio_borrar_entrenador(gimnasio_t* gimnasio)
+{
+    if (!gimnasio)
+    {
+        return ERROR;
+    }
+
+    entrenador_liberar(lista_tope(gimnasio->entrenadores));
+
+    return lista_desapilar(gimnasio->entrenadores);
+}
+
+/**
+ * Definido en juego.h
  */
 size_t gimnasio_entrenadores(gimnasio_t* gimnasio)
 {
     return gimnasio ? lista_elementos(gimnasio->entrenadores) : 0;
+}
+
+/**
+ * Definido en juego.h
+ */
+bool gimnasio_derrotado(gimnasio_t* gimnasio)
+{
+    return gimnasio ? gimnasio->derrotado : false;
 }
 
 /**
@@ -491,9 +527,9 @@ int juego_agregar_gimnasio(juego_t* juego, gimnasio_t* gimnasio)
 }
 
 /**
- * Descarta un gimnasio.
+ * Borra un gimnasio. El heap se encarga de liberar la memoria.
  */
-int juego_descartar_gimnasio(juego_t* juego)
+int juego_borrar_gimnasio(juego_t* juego)
 {
     return juego ? heap_extraer_raiz(juego->gimnasios) : ERROR;
 }
@@ -539,9 +575,9 @@ pokemon_t* pokemon_inicial()
     if (pokemon)
     {
         strcpy(pokemon->nombre, "Pikachu");
-        pokemon->ataque = 20;
-        pokemon->defensa = 18;
-        pokemon->velocidad = 26;
+        pokemon->ataque = 5;
+        pokemon->defensa = 5;
+        pokemon->velocidad = 5;
         pokemon->tipo_1 = pokemon->tipo_2 = 'E';
     }
 
@@ -598,9 +634,7 @@ entrenador_t* rival_actual(juego_t* juego)
  */
 pokemon_t* pokemon_enemigo(juego_t* juego)
 {
-    entrenador_t* rival = rival_actual(juego);
-
-    return rival ? lista_tope(rival->pkm_party) : NULL;
+    return entrenador_pokemon_actual(rival_actual(juego));
 }
 
 /**
@@ -616,25 +650,33 @@ entrenador_t* personaje_principal(juego_t* juego)
  */
 pokemon_t* pokemon_jugador(juego_t* juego)
 {
-    entrenador_t* jugador = personaje_principal(juego);
-
-    return jugador ? lista_tope(jugador->pkm_party) : NULL;
+    return entrenador_pokemon_actual(personaje_principal(juego));
 }
 
 /**
- *
+ * Devuelve true si el pokemon_1 ganó el combate.
+ */
+bool gana_pokemon_1(int resultado)
+{
+    return resultado > 0;
+}
+
+/**
+ * Recibe los Pokémon a combatir y el id de la función. Por el controlador
+ * externo se define el resultado de la batalla.
+ * 
+ * Si el resultado es > 0, pokemon_1 ha ganado y aumenta sus estadísticas.
  */
 int combate_pokemon(pokemon_t* pokemon_1, pokemon_t* pokemon_2, int id_funcion)
 {
-    if (!pokemon_1 || !pokemon_2 || id_funcion < MIN_FUNCIONES || id_funcion >= MAX_FUNCIONES)
+    if (!pokemon_1 || !pokemon_2)
     {
         return 0;
     }
 
-    int (*funcion_batalla)(void*, void*) = funciones_batalla[id_funcion];
-    int resultado = funcion_batalla(pokemon_1, pokemon_2);
+    int resultado = funcion_batalla_controller(id_funcion, pokemon_1, pokemon_2);
 
-    if (resultado == GANO_PRIMERO) {
+    if (gana_pokemon_1(resultado)) {
         pokemon_subir_estadisticas(pokemon_1);
     }
 
@@ -651,25 +693,48 @@ int combate_entrenadores(entrenador_t* entrenador_1, entrenador_t* entrenador_2,
         return 0;
     }
 
-    size_t poke_1 = 0, poke_2 = 0;
-    pokemon_t *pokemon_1 = lista_elemento_en_posicion(entrenador_1->pkm_party, poke_1),
-              *pokemon_2 = lista_elemento_en_posicion(entrenador_2->pkm_party, poke_2);
-    int resultado = combate_pokemon(pokemon_1, pokemon_2, id_funcion);
+    int resultado = combate_pokemon(
+            entrenador_pokemon_actual(entrenador_1),
+            entrenador_pokemon_actual(entrenador_2),
+            id_funcion
+            );
 
-    while (resultado != 0)
+    if (!resultado)
     {
-        if (resultado == GANO_PRIMERO)
-        {
-            pokemon_2 = lista_elemento_en_posicion(entrenador_2->pkm_party, poke_2++);
-        }
-        else
-        {
-            pokemon_1 = lista_elemento_en_posicion(entrenador_1->pkm_party, poke_1++);
-        }
-        resultado = combate_pokemon(pokemon_1, pokemon_2, id_funcion);
+        entrenador_1->pkm_actual = 0;
+        entrenador_2->pkm_actual = 0;
+        return 0;
     }
 
-    return resultado;
+    if (gana_pokemon_1(resultado))
+    {
+        entrenador_2->pkm_actual++;
+    }
+    else
+    {
+        entrenador_1->pkm_actual++;
+    }
+
+    int ganador = combate_entrenadores(entrenador_1, entrenador_2, id_funcion);
+
+    return ganador ? ganador : resultado;
+}
+
+/**
+ *
+ */
+int retar_entrenador(juego_t* juego)
+{
+    return combate_entrenadores(
+            personaje_principal(juego),
+            rival_actual(juego),
+            gimnasio_actual(juego)->id_funcion
+            );
+}
+
+int retar_lider(juego_t* juego)
+{
+    return retar_entrenador(juego);
 }
 
 /**
@@ -677,35 +742,26 @@ int combate_entrenadores(entrenador_t* entrenador_1, entrenador_t* entrenador_2,
  */
 int retar_gimnasio(juego_t* juego, void* mostrar(juego_t*))
 {
-    entrenador_t *rival = rival_actual(juego),
-                 *jugador = personaje_principal(juego);
     gimnasio_t* gimnasio = gimnasio_actual(juego);
 
-    if (!rival || !jugador || !gimnasio)
+    if (gimnasio_derrotado(gimnasio))
+    {
+        juego_borrar_gimnasio(juego);
+    }
+    if (!(gimnasio = gimnasio_actual(juego)))
     {
         return 0;
     }
 
-    if (gimnasio->derrotado)
+    int resultado = retar_entrenador(juego);
+
+    while (gana_pokemon_1(resultado) && gimnasio_entrenadores(gimnasio) > 1)
     {
-        juego_descartar_gimnasio(juego);
-        if (!(gimnasio = gimnasio_actual(juego)))
-        {
-            return 0;
-        }
+        gimnasio_borrar_entrenador(gimnasio);
+        resultado = retar_entrenador(juego);
     }
 
-    int resultado = combate_entrenadores(jugador, rival, gimnasio->id_funcion);
-
-    while (resultado == GANO_PRIMERO && gimnasio_entrenadores(gimnasio) > 1)
-    {
-        entrenador_liberar(rival);
-        lista_desapilar(gimnasio->entrenadores);
-        rival = rival_actual(juego);
-        resultado = combate_entrenadores(jugador, rival, gimnasio->id_funcion);
-    }
-
-    if (resultado == GANO_PRIMERO)
+    if (gana_pokemon_1(resultado))
     {
         gimnasio->derrotado = true;
     }
@@ -753,8 +809,7 @@ int tomar_pokemon(juego_t* juego, size_t posicion)
     entrenador_t* lider = rival_actual(juego);
     pokemon_t* pokemon;
 
-    if (!juego || !gimnasio || !gimnasio->derrotado || !lider 
-            || !(entrenador_pokemon(lider) < posicion))
+    if (!juego || !gimnasio || !gimnasio->derrotado || !lider)
     {
         return ERROR;
     }
@@ -762,7 +817,12 @@ int tomar_pokemon(juego_t* juego, size_t posicion)
     pokemon = lista_elemento_en_posicion(lider->pkm_obtenidos, posicion);
     lista_borrar_de_posicion(lider->pkm_obtenidos, posicion);
 
-    return entrenador_agregar_a_obtenidos(juego->jugador, pokemon);
+    if (entrenador_agregar_a_obtenidos(juego->jugador, pokemon) == ERROR)
+    {
+        return ERROR;
+    }
+
+    return juego_borrar_gimnasio(juego);
 }
 
 /*******************************************************************************
@@ -826,7 +886,7 @@ int cargar_entrenador(FILE* archivo, gimnasio_t* gimnasio)
         cargar_pokemon(archivo, entrenador);
     }
 
-    if ((entrenador_pokemon(entrenador) == 0)
+    if ((entrenador_pokemon_obtenidos(entrenador) == 0)
             || (gimnasio_agregar_entrenador(gimnasio, entrenador) == ERROR))
     {
         entrenador_liberar(entrenador);
@@ -936,7 +996,7 @@ int cargar_jugador(const char* ruta_archivo, juego_t* juego)
 
     fclose(archivo);
 
-    if (!entrenador_pokemon(jugador))
+    if (!entrenador_pokemon_obtenidos(jugador))
     {
         entrenador_liberar(jugador);
         return ERROR;

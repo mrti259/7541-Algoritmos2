@@ -1,6 +1,7 @@
 #ifndef __JUEGO_H__
 #define __JUEGO_H__
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #define MAX_NOMBRE 100
@@ -14,7 +15,21 @@ typedef struct gimnasio gimnasio_t;
 typedef struct juego juego_t;
 
 /**
- * Copia el nombre del Pokemon o lo deja en blanco ("") si falla.
+ * Argumentos:
+ *  - id_funcion es la función de batalla con la que combateran los Pokémon.
+ *               El controlador se responsabiliza de validar la id.
+ *  - pokemon_1 apunta al Pokémon que usará el personaje principal para el combate.
+ *  - pokemon_2 apunta al otro Pokémon que combatirá.
+ * 
+ * Devuelve:
+ *  - > 0 si gana pokemon_1
+ *  - < 0 si gana pokemon_2
+ *  - = 0 si no hay combate
+ */
+extern int funcion_batalla_controller(int id_funcion, pokemon_t* pokemon_1, pokemon_t* pokemon_2);
+
+/**
+ * Copia el nombre del Pokemon el vector o lo deja en blanco si no existe.
  */
 void pokemon_nombre(pokemon_t*, char[MAX_NOMBRE]);
 
@@ -44,14 +59,32 @@ char pokemon_tipo_principal(pokemon_t*);
 char pokemon_tipo_secundario(pokemon_t*);
 
 /**
- *
+ * Copia el nombre del entrenador o lo deja en blanco ("") si falla.
+ */
+void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
+
+/**
+ * Devuelve la cantidad de pokemon que tiene el entrenador en su party.
  */
 size_t entrenador_party(entrenador_t*);
 
 /**
- * Copia el nombre del entrenador o lo deja en blanco ("") si falla.
+ * Devuelve la cantidad de Pokémon que le quedan al entrenador para combatir.
  */
-void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
+size_t entrenador_pokemon_restante(entrenador_t*);
+
+/**
+ * Procedimiento que dado un entrenador y una funcion para mostrar
+ * información de Pokémon, recorre el party del entrenador y los muestra.
+ */
+void entrenador_mostrar_party(entrenador_t*, void (*mostrar)(pokemon_t*));
+
+/**
+ * Procedimiento que dado un entrenador y una funcion para mostrar
+ * información de Pokémon, recorre el conjunto de Pokémon obtenidos del
+ * entrenador y los muestra.
+ */
+void entrenador_mostrar_pokemon(entrenador_t*, void (*mostrar)(pokemon_t*));
 
 /**
  * Copia el nombre del gimnasio o lo deja en blanco ("") si falla.
@@ -59,9 +92,16 @@ void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
 void gimnasio_nombre(gimnasio_t*, char[MAX_NOMBRE]);
 
 /**
- *
+ * Devuelve la cantidad de entrenadores que hay quedan en el gimnasio.
+ * Devuelve 0 si no hay gimnasio.
  */
 size_t gimnasio_entrenadores(gimnasio_t*);
+
+/**
+ * Devuelve true si el gimnasio se encuentra derrotado.
+ * Devuelve false si no hay gimnasio.
+ */
+bool gimnasio_derrotado(gimnasio_t*);
 
 /**
  * Devuelve un puntero a una instancia de juego con sus valores inicializados en
@@ -117,17 +157,17 @@ pokemon_t* pokemon_jugador(juego_t*);
 int retar_gimnasio(juego_t*, void* mostrar(juego_t*));
 
 /**
- * Quita un Pokémon del party del jugador.
+ * Quita un Pokémon del party del jugador. Devuelve -1 si falla.
  */
 int quitar_del_party(juego_t*, size_t posicion);
 
 /**
- * Agrega un Pokémon de la caja del jugador a su party.
+ * Agrega un Pokémon de la caja del jugador a su party. Devuelve -1 si falla.
  */
 int agregar_a_party(juego_t*, size_t posicion);
 
 /**
- * Toma un Pokémon del líder del gimnasio si este fue vencido.
+ * Toma un Pokémon del líder del gimnasio si este fue vencido. Devuelve -1 si falla.
  */
 int tomar_pokemon(juego_t*, size_t posicion);
 

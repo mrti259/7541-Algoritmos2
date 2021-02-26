@@ -183,3 +183,24 @@ int funcion_batalla_5(void* pkm_1, void* pkm_2)
 
     return pts_1 > 2 ? GANO_PRIMERO : GANO_SEGUNDO;
 }
+
+/**
+ * Controller requerido por juego.h
+ */
+int funcion_batalla_controller(int id_funcion, pokemon_t* pokemon_1, pokemon_t* pokemon_2)
+{
+    if (id_funcion < 1 || id_funcion > 5)
+    {
+        return 0;
+    }
+
+    int (*funcion_batalla[])(void*, void*) = {
+        funcion_batalla_1,
+        funcion_batalla_2,
+        funcion_batalla_3,
+        funcion_batalla_4,
+        funcion_batalla_5
+    };
+
+    return funcion_batalla[id_funcion - 1](pokemon_1, pokemon_2);
+}

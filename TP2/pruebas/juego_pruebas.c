@@ -29,12 +29,15 @@ void pruebas_pokemon()
         pokemon->tipo_2 = 'B';
         strcpy(pokemon->nombre, "Dewpider");
     }
+
     afirmar(pokemon_ataque(pokemon) == 92, "Tiene 92 de ataque");
     afirmar(pokemon_defensa(pokemon) == 82, "Tiene 82 de defensa");
     afirmar(pokemon_velocidad(pokemon) == 102, "Tiene 102 de velocidad");
+
     afirmar(pokemon_puede_subir_estadisticas(pokemon), "Puede subir estadisticas");
     afirmar(pokemon_subir_estadisticas(pokemon) == SIN_ERROR, "Sube estadisticas");
     afirmar(!pokemon_puede_subir_estadisticas(pokemon), "No puede subir más");
+
     afirmar(pokemon_ataque(pokemon) == 93, "Tiene 93 de ataque");
     afirmar(pokemon_defensa(pokemon) == 83, "Tiene 83 de defensa");
     afirmar(pokemon_velocidad(pokemon) == 103, "Tiene 103 de velocidad");
@@ -89,43 +92,33 @@ void pruebas_entrenador()
     pokemon_t* pokemon = pokemon_crear();
     afirmar(!pokemon->en_party, "Tengo un Pokémon libre");
     afirmar(entrenador_agregar_pokemon(entrenador, pokemon) == 0,
-            "Puedo agregar un pokemon"
-           );
+            "Puedo agregar un pokemon");
     afirmar(pokemon->en_party, "El Pokémon está en el Party");
 
     crear_archivo_pokemon();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_pokemon(archivo, entrenador) == 0,
-            "Cargar un pokemon desde un archivo válido devuelve 0"
-           );
+            "Cargar un pokemon desde un archivo válido devuelve 0");
     afirmar(cargar_pokemon(archivo, entrenador) == -1,
-            "Si no puede cargar un pokemon devuelve -1"
-           );
+            "Si no puede cargar un pokemon devuelve -1");
     fclose(archivo);
 
     crear_archivo_pokemon_daniado();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_pokemon(archivo, entrenador) == -1,
-            "Cargar un pokemon desde un archivo dañado devuelve -1"
-           );
+            "Cargar un pokemon desde un archivo dañado devuelve -1");
     fclose(archivo);
     remove(ARCHIVO);
 
-    afirmar(entrenador_pokemon(entrenador) == 2,
-            "El entrenador tiene 2 Pokémon en total"
-           );
-    afirmar(entrenador_party(entrenador) == 2,
-            "Tiene 2 Pokémon en el party"
-           );
+    afirmar(entrenador_pokemon_obtenidos(entrenador) == 2,
+            "El entrenador tiene 2 Pokémon en total");
+    afirmar(entrenador_party(entrenador) == 2, "Tiene 2 Pokémon en el party");
 
     for (int i = 0; i < 10; i++)
         entrenador_agregar_pokemon(entrenador, pokemon_crear());
 
-    afirmar(entrenador_pokemon(entrenador) == 12,
-            "Ahora tiene 12 Pokémon en total");
-    afirmar(entrenador_party(entrenador) == 6,
-            "Tiene 6 Pokémon en el party"
-           );
+    afirmar(entrenador_pokemon_obtenidos(entrenador) == 12 , "Ahora tiene 12 Pokémon en total");
+    afirmar(entrenador_party(entrenador) == 6 , "Tiene 6 Pokémon en el party");
 
     entrenador_liberar(entrenador);
 }
@@ -171,50 +164,39 @@ void pruebas_gimnasio()
 
     entrenador_t* entrenador = entrenador_crear();
     afirmar(gimnasio_agregar_entrenador(gimnasio, entrenador) == 0,
-            "Puedo agregar un entrenador"
-           );
+            "Puedo agregar un entrenador");
 
     crear_archivo_entrenador();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_entrenador(archivo, gimnasio) == 0,
-            "Cargar un entrenador desde un archivo valido devuelve 0"
-           );
+            "Cargar un entrenador desde un archivo valido devuelve 0");
     afirmar(cargar_entrenador(archivo, gimnasio) == -1,
-            "Si no puede cargar un entrenador devuelve -1"
-           );
+            "Si no puede cargar un entrenador devuelve -1");
     fclose(archivo);
 
     crear_archivo_entrenador_daniado();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_entrenador(archivo, gimnasio) == -1,
-            "Cargar un entrenador desde un archivo dañado devuelve -1"
-           );
+            "Cargar un entrenador desde un archivo dañado devuelve -1");
     fclose(archivo);
 
-    afirmar(gimnasio_entrenadores(gimnasio) == 2,
-            "Hay 2 entrenadores"
-           );
+    afirmar(gimnasio_entrenadores(gimnasio) == 2, "Hay 2 entrenadores");
 
     afirmar(gimnasio_agregar_entrenador(gimnasio, NULL) == -1,
-            "No puedo agregar un entrenador NULL"
-           );
+            "No puedo agregar un entrenador NULL");
     afirmar(gimnasio_entrenadores(gimnasio) == 2,
-            "Hay 2 entrenadores"
-           );
+            "Hay 2 entrenadores");
     afirmar(gimnasio_agregar_entrenador(NULL, entrenador) == -1,
-            "No puedo agregar un entrenador a un gimnasio NULL"
-           );
+            "No puedo agregar un entrenador a un gimnasio NULL");
 
     crear_archivo_entrenador();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_entrenador(archivo, NULL) == -1,
-            "Cargar un entrenador a un gimnasio NULL devuelve -1"
-           );
+            "Cargar un entrenador a un gimnasio NULL devuelve -1");
     fclose(archivo);
     remove(ARCHIVO);
     afirmar(gimnasio_entrenadores(NULL) == 0,
-            "No hay entrenadores en un gimnasio NULL"
-           );
+            "No hay entrenadores en un gimnasio NULL");
 
     gimnasio_liberar(gimnasio);
 }
@@ -269,19 +251,19 @@ void crear_archivo_gimnasios()
     FILE* archivo = fopen(ARCHIVO, ESCRIBIR);
     if (archivo)
     {
-        fprintf(archivo, "G;Gimnasio de Ciudad Carmín;9;1\n");
+        fprintf(archivo, "G;Gimnasio de Ciudad Carmín;20;2\n");
         fprintf(archivo, "L;Lt. Surge\n");
         fprintf(archivo, "P;Voltorb;E;E;50;40;50\n");
-        fprintf(archivo, "P;Pikachu;E;E;90;50;60\n");
-        fprintf(archivo, "P;Raichu;E;E;90;50;60\n");
+        fprintf(archivo, "P;Pikachu;E;E;60;50;60\n");
+        fprintf(archivo, "P;Raichu;E;E;70;60;60\n");
         fprintf(archivo, "E;Marinero Dimas\n");
         fprintf(archivo, "P;Pikachu;E;E;40;50;30\n");
         fprintf(archivo, "P;Pikachu;E;E;40;50;30\n");
         fprintf(archivo, "E;Mecanico Manolo\n");
         fprintf(archivo, "P;Voltorb;E;E;45;30;20\n");
-        fprintf(archivo, "P;Magnamite;E;I;30;20;45\n");
+        fprintf(archivo, "P;Magnamite;E;I;30;60;45\n");
         fprintf(archivo, "E;Caballero Tito\n");
-        fprintf(archivo, "P;Pikachu;E;E;45;30;20\n");
+        fprintf(archivo, "P;Pikachu;E;E;45;30;40\n");
 
         fprintf(archivo, "G;Gimnasio de Ciudad Verde; 45; 3\n");
         fprintf(archivo, "L;Giovanni\n");
@@ -297,13 +279,13 @@ void crear_archivo_gimnasios()
         fprintf(archivo, "P;Graveler;S;S;40;50;30\n");
         fprintf(archivo, "P;Marowak;S;S;40;50;30\n");
 
-        fprintf(archivo, "\nG;Gimnasio de Ciudad Plateada;4;2\n"); // A pesar de las lineas se toma como válido
+        fprintf(archivo, "\nG;Gimnasio de Ciudad Plateada;4;1\n"); // A pesar de las lineas se toma como válido
         fprintf(archivo, "\nL;Brock\n");
-        fprintf(archivo, "P;Geodude;R;S;50;40;50\n");
-        fprintf(archivo, "\nP;Onix;R;S;50;50;60\n");
+        fprintf(archivo, "P;Geodude;R;S;30;35;30\n");
+        fprintf(archivo, "\nP;Onix;R;S;35;30;30\n");
         fprintf(archivo, "E;Campista Angelito\n");
-        fprintf(archivo, "P;Geodude;R;S;40;50;30\n");
-        fprintf(archivo, "P;Sandshrew;R;S;45;30;20\n");
+        fprintf(archivo, "P;Geodude;R;S;30;40;20\n");
+        fprintf(archivo, "P;Sandshrew;R;S;35;25;30\n");
 
         fprintf(archivo, "G;Gimnasio de Ciudad Celeste;15;4\n");
         fprintf(archivo, "P;Shellder;A;A;30;20;45\n"); // No tiene Lider por lo cual debe cancelarse
@@ -320,8 +302,8 @@ void crear_archivo_jugador()
     if (archivo)
     {
         fprintf(archivo, "E;Ash\n");
-        fprintf(archivo, "P;Pikachu;E;E;70;30;30\n");
-        fprintf(archivo, "P;Butterfree;B;V;50;40;50\n");
+        fprintf(archivo, "P;Pikachu;E;E;70;30;40\n");
+        fprintf(archivo, "P;Butterfree;B;V;40;40;50\n");
         fprintf(archivo, "P;Pidgeotto;V;N;65;40;30\n");
         fprintf(archivo, "P;Bulbasaur;P;P;20;40;30\n");
         fprintf(archivo, "P;Charmander;F;F;40;30;20\n");
@@ -372,30 +354,24 @@ void pruebas_juego()
 
     gimnasio_t* gimnasio = gimnasio_crear();
     afirmar(juego_agregar_gimnasio(juego, gimnasio) == 0,
-            "Puedo agregar un gimnasio"
-           );
+            "Puedo agregar un gimnasio");
     afirmar(juego_gimnasios(juego) == 1,
-            "Tengo un gimnasio cargado"
-           );
+            "Tengo un gimnasio cargado");
 
     crear_archivo_gimnasio();
     FILE* archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_gimnasio(archivo, juego) == 0,
-            "Cargar un gimnasio desde un archivo valido devuelve 0"
-           );
+            "Cargar un gimnasio desde un archivo valido devuelve 0");
     afirmar(cargar_gimnasio(archivo, juego) == -1,
-            "Si no puedo cargar un gimnasio devuelve -1"
-           );
+            "Si no puedo cargar un gimnasio devuelve -1");
     fclose(archivo);
     afirmar(juego_gimnasios(juego) == 2,
-            "Cargué 2 gimnasios"
-           );
+            "Cargué 2 gimnasios");
 
     crear_archivo_gimnasio_daniado();
     archivo = fopen(ARCHIVO, LEER);
     afirmar(cargar_gimnasio(archivo, juego) == -1,
-            "Cargar un gimnasio desde un archivo dañado devuelve -1"
-           );
+            "Cargar un gimnasio desde un archivo dañado devuelve -1");
     fclose(archivo);
 
     crear_archivo_gimnasios();
@@ -403,47 +379,37 @@ void pruebas_juego()
             "Cargar gimnasios desde un archivo valido aunque dañado devuelve 0"
            );
     afirmar(juego_gimnasios(juego) == 5,
-            "Se cuenta con 5 Gimnasios"
-           );
+            "Se cuenta con 5 Gimnasios");
 
     remove(ARCHIVO);
     afirmar(cargar_gimnasios(ARCHIVO, juego) == -1,
-            "Cargar gimnasios con un archivo inexistente devuelve -1"
-           );
+            "Cargar gimnasios con un archivo inexistente devuelve -1");
     afirmar(cargar_gimnasios("", juego) == -1,
-            "Cargar gimnasios sin un archivo devuelve -1"
-           );
+            "Cargar gimnasios sin un archivo devuelve -1");
 
     crear_archivo_jugador();
     afirmar(cargar_gimnasios(ARCHIVO, juego) == -1,
-            "Cargar gimnasios de un archivo no valido devuelve -1"
-           );
+            "Cargar gimnasios de un archivo no valido devuelve -1");
 
     afirmar(cargar_jugador(ARCHIVO, juego) == 0,
-            "Cargar un jugador principal desde un archivo valido devuelve 0"
-           );
+            "Cargar un jugador principal desde un archivo valido devuelve 0");
 
     crear_archivo_gimnasio();
     afirmar(cargar_jugador(ARCHIVO, juego) == -1,
-            "Cargar un jugador principal desde un archivo no valido devuelve -1"
-           );
+            "Cargar un jugador principal desde un archivo no valido devuelve -1");
 
     crear_archivo_jugador_daniado();
     afirmar(cargar_jugador(ARCHIVO, juego) == -1,
-            "Cargar un jugador principal desde un archivo dañado devuelve -1"
-           );
+            "Cargar un jugador principal desde un archivo dañado devuelve -1");
 
     remove(ARCHIVO);
     afirmar(cargar_jugador(ARCHIVO, juego) == -1,
-            "Cargar un jugador principal con un archivo inexistente devuelve -1"
-           );
+            "Cargar un jugador principal con un archivo inexistente devuelve -1");
     afirmar(cargar_jugador("", juego) == -1,
-            "Cargar un jugador principal sin un archivo devuelve -1"
-           );
+            "Cargar un jugador principal sin un archivo devuelve -1");
 
-    afirmar(juego_descartar_gimnasio(juego) == 0,
-            "Puedo eliminar un gimnasio"
-           );
+    afirmar(juego_borrar_gimnasio(juego) == 0,
+            "Puedo eliminar un gimnasio");
     afirmar(juego_gimnasios(juego) == 4,
             "Ahora hay 4 gimnasios"
            );
@@ -455,24 +421,19 @@ void pruebas_juego()
 
     gimnasio_nombre(gimnasio, str);
     afirmar(strcmp(str, "Gimnasio de Ciudad Plateada") == 0,
-            "El gimnasio actual es el Gimnasio de Ciudad Plateada"
-           );
+            "El gimnasio actual es el Gimnasio de Ciudad Plateada");
     afirmar(gimnasio_entrenadores(gimnasio) == 2,
-            "El gimnasio tiene 2 rivales"
-           );
+            "El gimnasio tiene 2 rivales");
 
     entrenador_nombre(entrenador, str);
     afirmar(strcmp(str, "Campista Angelito") == 0,
-            "El primer rival es el Campista Angelito"
-           );
-    afirmar(entrenador_pokemon(entrenador) == 2,
-            "Tiene 2 Pokémon"
-           );
+            "El primer rival es el Campista Angelito");
+    afirmar(entrenador_pokemon_obtenidos(entrenador) == 2,
+            "Tiene 2 Pokémon");
 
     pokemon_nombre(pokemon, str);
     afirmar(strcmp(str, "Geodude") == 0,
-            "El primer Pokémon rival es Geodude"
-           );
+            "El primer Pokémon rival es Geodude");
 
     juego_liberar(juego);
 }
@@ -486,28 +447,21 @@ void pruebas_guardado()
     juego_t* juego = juego_crear();
 
     afirmar(juego_nuevo(NULL, "Bor") == -1,
-            "No puedo crear mi personaje sin juego"
-           );
+            "No puedo crear mi personaje sin juego");
     afirmar(juego_nuevo(juego, "") == -1,
-            "No puedo crear mi personaje sin nombre"
-           );
+            "No puedo crear mi personaje sin nombre");
     afirmar(juego_nuevo(juego, "Bor") == 0,
-            "Puedo crear mi personaje"
-           );
+            "Puedo crear mi personaje");
 
     afirmar(guardar_jugador("", juego) == -1,
-            "No puedo guardar mi personaje sin indicar archivo"
-           );
+            "No puedo guardar mi personaje sin indicar archivo");
     afirmar(guardar_jugador(ARCHIVO, NULL) == -1,
-            "No puedo guardar mi personaje sin un juego"
-           );
+            "No puedo guardar mi personaje sin un juego");
     afirmar(guardar_jugador(ARCHIVO, juego) == 0,
-            "Puedo guardar mi personaje"
-           );
+            "Puedo guardar mi personaje");
 
     afirmar(cargar_jugador(ARCHIVO, juego) == 0,
-            "Mi formato es válido para volver a cargarlo luego"
-           );
+            "Mi formato es válido para volver a cargarlo luego");
 
     juego_liberar(juego);
 }
@@ -541,35 +495,29 @@ void pruebas_batallas()
     }
 
     afirmar(funcion_batalla_1(pkm_1, pkm_2) == GANO_PRIMERO,
-            "Funcion batalla 1: Gana primero"
-           );
+            "Funcion batalla 1: Gana primero");
     afirmar(funcion_batalla_1(pkm_2, pkm_1) == GANO_SEGUNDO,
-            "Funcion batalla 1: Gana segundo"
-           );
+            "Funcion batalla 1: Gana segundo");
+
     afirmar(funcion_batalla_2(pkm_1, pkm_2) == GANO_PRIMERO,
-            "Funcion batalla 2: Gana primero"
-           );
+            "Funcion batalla 2: Gana primero");
     afirmar(funcion_batalla_2(pkm_2, pkm_1) == GANO_SEGUNDO,
-            "Funcion batalla 2: Gana segundo"
-           );
+            "Funcion batalla 2: Gana segundo");
+
     afirmar(funcion_batalla_3(pkm_1, pkm_2) == GANO_PRIMERO,
-            "Funcion batalla 3: Gana primero"
-           );
+            "Funcion batalla 3: Gana primero");
     afirmar(funcion_batalla_3(pkm_2, pkm_1) == GANO_SEGUNDO,
-            "Funcion batalla 3: Gana segundo"
-           );
+            "Funcion batalla 3: Gana segundo");
+
     afirmar(funcion_batalla_4(pkm_1, pkm_2) == GANO_PRIMERO,
-            "Funcion batalla 4: Gana primero"
-           );
+            "Funcion batalla 4: Gana primero");
     afirmar(funcion_batalla_4(pkm_2, pkm_1) == GANO_SEGUNDO,
-            "Funcion batalla 4: Gana segundo"
-           );
+            "Funcion batalla 4: Gana segundo");
+
     afirmar(funcion_batalla_5(pkm_1, pkm_2) == GANO_PRIMERO,
-            "Funcion batalla 5: Gana primero"
-           );
+            "Funcion batalla 5: Gana primero");
     afirmar(funcion_batalla_5(pkm_2, pkm_1) == GANO_SEGUNDO,
-            "Funcion batalla 5: Gana segundo"
-           );
+            "Funcion batalla 5: Gana segundo");
 
     pokemon_liberar(pkm_1);
     pokemon_liberar(pkm_2);
@@ -583,7 +531,6 @@ void pruebas_jugabilidad()
 {
     nuevo_grupo("Pruebas jugabilidad");
 
-    char str[MAX_NOMBRE] = "";
     juego_t* juego = juego_crear();
     crear_archivo_jugador();
     cargar_jugador(ARCHIVO, juego);
@@ -591,92 +538,69 @@ void pruebas_jugabilidad()
     cargar_gimnasios(ARCHIVO, juego);
     remove(ARCHIVO);
 
-    afirmar(tomar_pokemon(juego, 0) == -1,
-            "No puedo tomar un Pokémon sin vencer un gimnasio"
-            );
-    /*
-     * retar pokemon -> gana -> aumentan stats
-     *
-     * retar entrenador -> flujo
-     *
-     * retar gimnasio -> flujo
-     */
+    afirmar(!gimnasio_derrotado(gimnasio_actual(juego)),
+            "El gimnasio figura como no derrotado")
 
-    pokemon_t *pkm_jugador = pokemon_jugador(juego), 
-              *pkm_enemigo = pokemon_enemigo(juego);
-    int ataque = pokemon_ataque(pkm_jugador);
-    pokemon_nombre(pkm_jugador, str);
-    
-    afirmar(strcmp(str, "Pikachu") == 0,
-            "El Pokemon actual es Pikachu"
-           );
-    afirmar(combate_pokemon(pkm_jugador, pkm_enemigo, 1) == 1,
-            "Gano la primera pelea"
-            );
-    afirmar(pokemon_ataque(pkm_jugador) == ataque + 1,
-            "El ataque de mi Pokémon aumentó en 1"
-            );
+    afirmar(tomar_pokemon(juego, 0) == -1, "No puedo tomar un Pokémon sin vencer un gimnasio");
 
-    afirmar(combate_entrenadores(personaje_principal(juego), rival_actual(juego), 1) == 1,
-            "Le gano al primer entrenador"
-            );
+    afirmar(juego_gimnasios(juego) == 3 , "Tengo 3 gimnasios cargados");
 
-    afirmar(combate_pokemon(pokemon_jugador(juego), pokemon_enemigo(juego), 1) == -1,
-            "Pierdo la primera pelea"
-            );
-    pokemon_nombre(pokemon_jugador(juego), str);
-    afirmar(strcmp(str, "Butterfree") == 0,
-            "El Pokemon actual es Butterfree"
-           );
-    afirmar(combate_entrenadores(personaje_principal(juego), rival_actual(juego), 1) == 1,
-            "Gano la segunda pelea"
-            );
-    pokemon_nombre(pokemon_jugador(juego), str);
-    afirmar(strcmp(str, "Pikachu") == 0,
-            "El Pokemon actual es Pikachu"
-           );
-    afirmar(pokemon_ataque(pokemon_jugador(juego)) == ataque + 1,
-            "Conservó sus stats"
-            );
+    afirmar(gimnasio_entrenadores(gimnasio_actual(juego)) == 2,
+            "El primer gimnasio tiene 2 entrenadores");
 
-    afirmar(entrenador_party(personaje_principal(juego)) == 6,
-            "Mi personaje tiene 6 Pokémon"
-           );
-    pokemon_nombre(pokemon_jugador(juego), str);
-    afirmar(strcmp(str, "Pikachu") == 0,
-            "El Pokemon actual es Pikachu"
-           );
-    afirmar(quitar_del_party(juego, 0) == 0,
-            "Quite del party Pikachu");
-    pokemon_nombre(pokemon_jugador(juego), str);
-    afirmar(strcmp(str, "Butterfree") == 0,
-            "El Pokemon actual es Butterfree"
-           );
-    afirmar(quitar_del_party(juego, 0) == 0,
-            "Quite al 1 Pokemón");
-    afirmar(entrenador_party(personaje_principal(juego)) == 4,
-            "Mi personaje tiene 4 Pokémon"
-           );
+    afirmar(pokemon_jugador(juego)->adicional == 0,
+            "El primer Pokémon del personaje ganó 0 combates");
 
-    afirmar(agregar_a_party(juego, 3) == -1,
-            "El Pokémon que se intenta agregar ya esta en el Party"
-            );
-    afirmar(agregar_a_party(juego, 4) == 0,
-            "Se agrega un Pokémon de la caja al party"
-            );
-    afirmar(entrenador_party(personaje_principal(juego)) == 5,
-            "Mi personaje ahora tiene 5 Pokemón"
-           );
-    afirmar(agregar_a_party(juego, 4) == -1,
-            "El Pokemón ya está en el Party"
-            );
+    afirmar(combate_entrenadores(personaje_principal(juego), rival_actual(juego), gimnasio_actual(juego)->id_funcion) == 1,
+            "El personaje principal le gana al primer entrenador");
+    afirmar(pokemon_jugador(juego)->adicional == 2,
+            "El primer Pokémon del personaje ganó 2 combates");
+
+    afirmar(retar_gimnasio(juego, NULL) == 1,
+            "El personaje principal vence el primer gimnasio")
+    afirmar(gimnasio_derrotado(gimnasio_actual(juego)),
+            "El gimnasio figura como derrotado")
+    afirmar(strcmp(rival_actual(juego)->nombre, "Brock") == 0,
+            "El rival actual sigue siendo Brock (vencido)");
+    afirmar(pokemon_jugador(juego)->adicional == 6,
+            "El primer Pokémon del personaje ganó 6 combates");
 
     afirmar(tomar_pokemon(juego, 0) == 0,
-            "Puedo tomar un Pokemón después de vencer un gimnasio"
-            );
+            "Puedo tomar un Pokemón después de vencer un gimnasio");
     afirmar(tomar_pokemon(juego, 0 ) == -1,
-            "No puedo tomar otro Pokemón"
-            );
+            "No puedo tomar otro Pokemón");
+    afirmar(strcmp(gimnasio_actual(juego)->nombre, "Gimnasio de Ciudad Carmín") == 0,
+            "El próximo gimnasio es el de Ciudad Carmín");
+    afirmar(strcmp(rival_actual(juego)->nombre, "Caballero Tito") == 0,
+            "El próximo rival es el Caballero Tito");
+
+    afirmar(retar_gimnasio(juego, NULL) == -1,
+            "El personaje no puede vencer el gimnasio con su equipo");
+
+    afirmar(entrenador_party(personaje_principal(juego)) == 6,
+            "Mi personaje tiene 6 Pokémon");
+    afirmar(strcmp(pokemon_jugador(juego)->nombre, "Pikachu") == 0,
+            "El Pokemon actual es Pikachu");
+    afirmar(quitar_del_party(juego, 0) == 0,
+            "Quite del party al primer Pokémon del jugador");
+
+    afirmar(strcmp(pokemon_jugador(juego)->nombre, "Butterfree") == 0,
+            "El Pokemon actual es Butterfree");
+    afirmar(quitar_del_party(juego, 0) == 0,
+            "Quite a Butterfree");
+    afirmar(entrenador_party(personaje_principal(juego)) == 4,
+            "Mi personaje tiene 4 Pokémon");
+    afirmar(strcmp(pokemon_jugador(juego)->nombre, "Pidgeotto") == 0,
+            "El Pokemon actual es Pidgeotto");
+
+    afirmar(agregar_a_party(juego, 3) == -1,
+            "El Pokémon que se intenta agregar ya esta en el party");
+    afirmar(agregar_a_party(juego, 4) == 0,
+            "Se agrega un Pokémon de la caja al party");
+    afirmar(entrenador_party(personaje_principal(juego)) == 5,
+            "Mi personaje ahora tiene 5 Pokemón");
+    afirmar(agregar_a_party(juego, 4) == -1,
+            "Se intenta agregar otra vez un Pokémon que ya esta en el party");
 
     juego_liberar(juego);
 }
@@ -708,37 +632,27 @@ void pruebas_con_null()
         pkm_2->tipo_2 = 'N';
         strcpy(pkm_2->nombre, "Pidgeotto");
     }
- 
+
     afirmar(funcion_batalla_1(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 1: Gana primero"
-           );
+            "Funcion batalla 1: Gana primero");
     afirmar(funcion_batalla_1(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 1: Gana segundo"
-           );
+            "Funcion batalla 1: Gana segundo");
     afirmar(funcion_batalla_2(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 2: Gana primero"
-           );
+            "Funcion batalla 2: Gana primero");
     afirmar(funcion_batalla_2(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 2: Gana segundo"
-           );
+            "Funcion batalla 2: Gana segundo");
     afirmar(funcion_batalla_3(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 3: Gana primero"
-           );
+            "Funcion batalla 3: Gana primero");
     afirmar(funcion_batalla_3(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 3: Gana segundo"
-           );
+            "Funcion batalla 3: Gana segundo");
     afirmar(funcion_batalla_4(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 4: Gana primero"
-           );
+            "Funcion batalla 4: Gana primero");
     afirmar(funcion_batalla_4(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 4: Gana segundo"
-           );
+            "Funcion batalla 4: Gana segundo");
     afirmar(funcion_batalla_5(pkm_2, NULL) == GANO_PRIMERO,
-            "Funcion batalla 1: Gana primero"
-           );
+            "Funcion batalla 1: Gana primero");
     afirmar(funcion_batalla_5(NULL, pkm_2) == GANO_SEGUNDO,
-            "Funcion batalla 1: Gana segundo"
-           );
+            "Funcion batalla 1: Gana segundo");
 
     /**
      * agregar todas las funciones de juego.h

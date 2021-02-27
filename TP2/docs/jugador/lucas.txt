@@ -1,0 +1,4 @@
+E;Lucas
+P;Pikachu;E;E;15;12;14
+P;Growlithe;F;F;26;18;26
+P;Zapdos;E;V;50;55;43

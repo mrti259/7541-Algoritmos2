@@ -1,0 +1,5 @@
+E;Valen
+P;Lapras;A;A;40;50;30
+P;Vaporeon;A;A;45;40;55
+P;Chikorita;H;H;20;26;18
+P;Kadabra;P;P;30;35;32

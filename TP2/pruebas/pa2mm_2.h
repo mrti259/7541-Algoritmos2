@@ -1,7 +1,7 @@
 /*
-variante de pa2mm.h con nombres mas simples.
-corrección de mensaje de salida final.
-*/
+   variante de pa2mm.h con nombres mas simples.
+   corrección de mensaje de salida final.
+   */
 
 #ifndef __PA2M_2_H_
 #define __PA2M_2_H_
@@ -40,19 +40,19 @@ void __morir(int signum){
 }
 
 #define afirmar(afirmacion, descripcion) do {\
-        __prueba_actual = descripcion;\
-        __atajarse(__morir);\
-        if (afirmacion) {\
-            printf( VERDE TILDE " ");\
-        } else {\
-            __pruebas_fallidas++;\
-            printf( ROJO CRUZ " ");\
-        }\
-        printf(BLANCO "%s\n" RESET, __prueba_actual);\
-        fflush(stdout);\
-        __prueba_actual = NULL;\
-        __pruebas_corridas++;\
-    }while(0);
+    __prueba_actual = descripcion;\
+    __atajarse(__morir);\
+    if (afirmacion) {\
+        printf( VERDE TILDE " ");\
+    } else {\
+        __pruebas_fallidas++;\
+        printf( ROJO CRUZ " ");\
+    }\
+    printf(BLANCO "%s\n" RESET, __prueba_actual);\
+    fflush(stdout);\
+    __prueba_actual = NULL;\
+    __pruebas_corridas++;\
+}while(0);
 
 void nuevo_grupo(const char* descripcion){
     printf(AMARILLO "\n%s\n", descripcion);
@@ -62,11 +62,11 @@ void nuevo_grupo(const char* descripcion){
 
 int mostrar_reporte() {
     printf(BLANCO "\n---------------------------------\n"
-                 "%i pruebas corridas, %i error%s - %s\n" RESET,
-                 __pruebas_corridas,
-                 __pruebas_fallidas,
-                 __pruebas_fallidas == 1 ? "" : "es",
-                 __pruebas_fallidas == 0 ? "OK" : "D:");
+            "%i pruebas corridas, %i error%s - %s\n" RESET,
+            __pruebas_corridas,
+            __pruebas_fallidas,
+            __pruebas_fallidas == 1 ? "" : "es",
+            __pruebas_fallidas == 0 ? "OK" : "D:");
     return __pruebas_fallidas;
 }
 

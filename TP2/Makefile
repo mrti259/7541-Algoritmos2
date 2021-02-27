@@ -10,15 +10,17 @@ DIR_TESTS = pruebas
 all: build files play
 
 build:
-	$(CC) $(CFLAGS) $(EXEC) $(CFILES)
+	@echo "Compilando..."
+	@$(CC) $(CFLAGS) $(EXEC) $(CFILES)
 
 files:
-	mkdir -p datos/jugador datos/gimnasios
-	cp docs/jugador.txt.example datos/jugador/example.txt
-	cp docs/gimnasios.txt.example datos/gimnasios/example.txt
+	@echo "Creando copiando algunos archivos de ejemplo..."
+	@mkdir -p datos/jugador datos/gimnasios
+	@cp docs/jugador/* datos/jugador/
+	@cp docs/gimnasios/* datos/gimnasios/
 
 play:
-	./$(EXEC)
+	@./$(EXEC)
 
 test: build files
 	$(VAL) $(VFLAGS) ./$(EXEC)

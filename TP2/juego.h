@@ -154,7 +154,7 @@ pokemon_t* pokemon_jugador(juego_t*);
 /**
  * Inicia las batallas contra un gimnasio,
  */
-int retar_gimnasio(juego_t*, void* mostrar(juego_t*));
+int retar_gimnasio(juego_t*, void (*mostrar)(juego_t*));
 
 /**
  * Quita un Pokémon del party del jugador. Devuelve -1 si falla.

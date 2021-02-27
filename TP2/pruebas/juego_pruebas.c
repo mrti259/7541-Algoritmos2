@@ -551,7 +551,7 @@ void pruebas_jugabilidad()
     afirmar(pokemon_jugador(juego)->adicional == 0,
             "El primer Pokémon del personaje ganó 0 combates");
 
-    afirmar(combate_entrenadores(personaje_principal(juego), rival_actual(juego), gimnasio_actual(juego)->id_funcion) == 1,
+    afirmar(combate_entrenadores(juego, NULL) > 0,
             "El personaje principal le gana al primer entrenador");
     afirmar(pokemon_jugador(juego)->adicional == 2,
             "El primer Pokémon del personaje ganó 2 combates");

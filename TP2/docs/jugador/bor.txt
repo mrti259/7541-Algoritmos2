@@ -1,0 +1,4 @@
+E;Bor
+P;Bulbasaur;H;H;7;8;5
+P;Pidgey;N;V;6;5;8
+P;Rattata;N;N;5;4;7

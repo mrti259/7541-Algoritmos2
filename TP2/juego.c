@@ -662,21 +662,30 @@ bool gana_pokemon_1(int resultado)
 }
 
 /**
- * Recibe los Pokémon a combatir y el id de la función. Por el controlador
- * externo se define el resultado de la batalla.
- * 
- * Si el resultado es > 0, pokemon_1 ha ganado y aumenta sus estadísticas.
+ * Recibe la instancia de juego y puede recibir una funcion para mostrar.
+ * La id_funcion se pasa al controlador de funciones de batalla para determinar
+ * el resultado del combate.
+ * Si el Pokémon del jugador gana el combate y puede subir sus estadísticas, estas
+ * se aumentan.
  */
-int combate_pokemon(pokemon_t* pokemon_1, pokemon_t* pokemon_2, int id_funcion)
+int combate_pokemon(juego_t* juego,
+                    void (*mostrar)(juego_t*))
 {
-    if (!pokemon_1 || !pokemon_2)
+    pokemon_t *pokemon_1 = pokemon_jugador(juego),
+              *pokemon_2 = pokemon_enemigo(juego);
+    gimnasio_t *gimnasio = gimnasio_actual(juego);
+
+    if (!pokemon_1 || !pokemon_2 || !gimnasio)
     {
         return 0;
     }
 
-    int resultado = funcion_batalla_controller(id_funcion, pokemon_1, pokemon_2);
+    if (mostrar) mostrar(juego);
 
-    if (gana_pokemon_1(resultado)) {
+    int resultado = funcion_batalla_controller(gimnasio->id_funcion, pokemon_1, pokemon_2);
+
+    if (gana_pokemon_1(resultado) && pokemon_puede_subir_estadisticas(pokemon_1))
+    {
         pokemon_subir_estadisticas(pokemon_1);
     }
 
@@ -684,23 +693,30 @@ int combate_pokemon(pokemon_t* pokemon_1, pokemon_t* pokemon_2, int id_funcion)
 }
 
 /**
+ * Combate a los Pokémon de los entrenadores hasta que uno de ellos se quede sin Pokémon
+ * para combatir.
  *
+ * Devuelve:
+ *  = 0 si no se pudo combatir.
+ *  > 0 si gana el personaje_principal.
+ *  < 0 si gana el rival_actual.
  */
-int combate_entrenadores(entrenador_t* entrenador_1, entrenador_t* entrenador_2, int id_funcion)
+int combate_entrenadores(juego_t* juego,
+                        void (*mostrar)(juego_t*))
 {
+    entrenador_t *entrenador_1 = personaje_principal(juego),
+                 *entrenador_2 = rival_actual(juego);
+
     if (!entrenador_1 || !entrenador_2)
     {
         return 0;
     }
 
-    int resultado = combate_pokemon(
-            entrenador_pokemon_actual(entrenador_1),
-            entrenador_pokemon_actual(entrenador_2),
-            id_funcion
-            );
+    int resultado = combate_pokemon(juego, mostrar);
 
     if (!resultado)
     {
+        // El combate terminó. Los Pokémon vencidos se recuperan.
         entrenador_1->pkm_actual = 0;
         entrenador_2->pkm_actual = 0;
         return 0;
@@ -715,50 +731,34 @@ int combate_entrenadores(entrenador_t* entrenador_1, entrenador_t* entrenador_2,
         entrenador_1->pkm_actual++;
     }
 
-    int ganador = combate_entrenadores(entrenador_1, entrenador_2, id_funcion);
+    int ganador = combate_entrenadores(juego, mostrar);
 
     return ganador ? ganador : resultado;
 }
 
 /**
- *
- */
-int retar_entrenador(juego_t* juego)
-{
-    return combate_entrenadores(
-            personaje_principal(juego),
-            rival_actual(juego),
-            gimnasio_actual(juego)->id_funcion
-            );
-}
-
-int retar_lider(juego_t* juego)
-{
-    return retar_entrenador(juego);
-}
-
-/**
  * Definido en juego.h
  */
-int retar_gimnasio(juego_t* juego, void* mostrar(juego_t*))
+int retar_gimnasio(juego_t* juego, void (*mostrar)(juego_t*))
 {
-    gimnasio_t* gimnasio = gimnasio_actual(juego);
-
-    if (gimnasio_derrotado(gimnasio))
+    if (gimnasio_derrotado(gimnasio_actual(juego)))
     {
         juego_borrar_gimnasio(juego);
     }
+
+    gimnasio_t* gimnasio;
+
     if (!(gimnasio = gimnasio_actual(juego)))
     {
         return 0;
     }
 
-    int resultado = retar_entrenador(juego);
+    int resultado = combate_entrenadores(juego, mostrar);
 
     while (gana_pokemon_1(resultado) && gimnasio_entrenadores(gimnasio) > 1)
     {
         gimnasio_borrar_entrenador(gimnasio);
-        resultado = retar_entrenador(juego);
+        resultado = combate_entrenadores(juego, mostrar);
     }
 
     if (gana_pokemon_1(resultado))
@@ -830,7 +830,7 @@ int tomar_pokemon(juego_t* juego, size_t posicion)
  ******************************************************************************/
 
 /**
- *
+ * Devuelve el primer caracter no blanco leído.
  */
 char caracter_leido(FILE* stream)
 {
@@ -948,7 +948,8 @@ int cargar_gimnasios(const char* ruta_archivo, juego_t* juego)
 {
     FILE* archivo;
 
-    if (!ruta_archivo || !juego || !(archivo = fopen(ruta_archivo, LECTURA)))
+    if (!ruta_archivo || !juego
+        || !(archivo = fopen(ruta_archivo, LECTURA))) // ~> no hay resource leak
     {
         return ERROR;
     }
@@ -976,7 +977,8 @@ int cargar_jugador(const char* ruta_archivo, juego_t* juego)
     FILE* archivo;
     entrenador_t* jugador;
 
-    if (!ruta_archivo || !juego || !(archivo = fopen(ruta_archivo, LECTURA)))
+    if (!ruta_archivo || !juego
+        || !(archivo = fopen(ruta_archivo, LECTURA))) // ~> No hay resource leak
     {
         return ERROR;
     }
@@ -1041,7 +1043,7 @@ int guardar_jugador(const char* ruta_archivo, juego_t* juego)
     FILE* archivo;
 
     if (!ruta_archivo || !juego || !juego->jugador
-            || !(archivo = fopen(ruta_archivo, ESCRITURA)))
+        || !(archivo = fopen(ruta_archivo, ESCRITURA))) // ~> No hay resource leak
     {
         return ERROR;
     }

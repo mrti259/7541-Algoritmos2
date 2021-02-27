@@ -32,8 +32,8 @@ Ahora en una consola ejecuta el siguiente comando:
 ## Desarrollo
 
 En `inicio.c` se brindan las funciones que permiten darle una interfaz por
-consola al programa para facilitar su jugabilidad. Esta hecho a modo de
-ejemplo, ya se que es horrible en tanto apariencia y en código.
+consola al programa para facilitar su jugabilidad. Está hecho a modo de
+ejemplo, ya sé que es horrible en tanto apariencia y en código.
 
 En `juego.h` se encuentran las funciones esenciales para reproducir la lógica
 del juego. Estas estructuras y operaciones se encuentran encapsuladas para
@@ -66,10 +66,11 @@ para agregar colores a la interfaz.
 
 #### Pokémon
 
-Son criaturas privadas de su libertad para combatir entre ellas. Estas tienen
-diferentes habilidades que van por los elementos que manejan (tipos) y sus
-estadísticas de ataque, defensa y velocidad. Cuando combaten pueden mejorar sus
-estadísticas y ser explotados en mayor medida por sus captores.
+Son criaturas privadas de su libertad y entrenadas para combatir entre ellas.
+Estas tienen diferentes habilidades que van por los elementos que manejan
+(tipos) y sus estadísticas de ataque, defensa y velocidad. Cuando combaten
+pueden mejorar sus estadísticas y ser explotados en mayor medida por sus
+captores.
 
 #### Entrenadores
 
@@ -90,7 +91,7 @@ Cuando un entrenador decide enfrentar a otro, podríamos pensar en la
 implementación de una cola: el primer Pokémon de su party será el primero en
 combatir y a medida que agotan su energía se va avanzando en la cola. Pero por
 lo mencionado anteriormente en el armado del equipo segun party/caja,
-concluimos que usar una lista es más conveniente, y durante los combates, se
+concluimos que usar una lista es más conveniente y, durante los combates, se
 conservan las listas y se utiliza un iterador para avanzar sobre ellas a medida
 que cambian los Pokémon
 
@@ -103,15 +104,15 @@ El enfrentamiento contra entrenadores tiene orden y se pelea contra rivales más
 débiles hasta llegar al líder que cuenta con estadísticas más altas para
 presentar un desafío para el jugador.
 
-El líder es la figura central por lo que cuando se carga un gimnasio primero
+El líder es la figura central por lo que, cuando se carga un gimnasio, primero
 debe asegurarse que haya un líder (que además cuente con Pokémon) y después se
 cargan los entrenadores.
 
 Por esta razón, los gimnasios hacen uso de una pila que organice a los
 entrenadores que contiene. El líder es el primer elemento a cargar y el último
 a borrar cuando ya se hayan eliminado los otros entrenadores. Para desapilar un
-entrenador, primero debe vencerse por lo que primero se combate y si el usuario
-resulta ganador, se borra el entrenador.
+entrenador, primero hay que vencerlo. Por lo tanto, primero se combate y si el
+usuario resulta ganador, se borra lo borra.
 
 Sobre el líder se hace una excepción porque después de vencerlo se tiene la
 posibilidad de tomar uno de sus Pokemón. Por este motivo, antes de borrarlo y
@@ -135,14 +136,14 @@ devolverá cuál es el gimnasio con el que debe combatir.
 Es la estructura principal para el desarrollo del juego. Se crea un personaje,
 que será el jugador y se cargan los gimnasios contra los que se peleará.
 
-El personaje principal siempre debe contar con al menos un Pokémon, por eso
-cuando no se pueda cargar uno, se dará la posibilidad de crear uno nuevo y se
-le entregará uno.
+El personaje principal siempre debe contar con al menos un Pokémon. Por eso,
+cuando no se pueda cargar ninguno, se dará la posibilidad de iniciar una nueva
+partida y, en su nueva aventura, se le entregará un Pokémon inicial.
 
 Luego se deberán cargar los gimnasios con los cuales comenzar la aventura. Cada
 gimnasio debe tener un líder y el líder debe tener al menos un Pokémon. Los
-entrenadores restante que pertenezcan al gimnasio, también deben tener al menos
-un Pokémon y prepararán al jugador para el combate final.
+entrenadores restantes que pertenezcan al gimnasio, también deben tener al
+menos un Pokémon y prepararán al jugador para el combate final.
 
 El juego siempre conoce quién es el personaje principal, cuál es el Pokémon con
 el que combatirá, quién es su próximo contricante y qué Pokémon utilizará.

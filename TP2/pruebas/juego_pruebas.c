@@ -557,12 +557,12 @@ void pruebas_jugabilidad()
     cargar_jugador(ARCHIVO, juego);
     crear_archivo_gimnasios();
     cargar_gimnasios(ARCHIVO, juego);
-    remove(ARCHIVO);
 
     afirmar(!gimnasio_derrotado(gimnasio_actual(juego)),
             "El gimnasio figura como no derrotado")
 
     afirmar(tomar_pokemon(juego, 0) == -1, "No puedo tomar un Pokémon sin vencer un gimnasio");
+    afirmar(avanzar_gimnasio(juego) == -1, "No puedo avanzar un gimnasio sin vencerlo antes");
 
     afirmar(juego_gimnasios(juego) == 3 , "Tengo 3 gimnasios cargados");
 
@@ -599,6 +599,12 @@ void pruebas_jugabilidad()
 
     afirmar(retar_gimnasio(juego, NULL) == -1,
             "El personaje no puede vencer el gimnasio con su equipo");
+
+    // recupero el gimnasio
+    cargar_gimnasios(ARCHIVO, juego);
+    remove(ARCHIVO);
+    afirmar(retar_gimnasio(juego, NULL) == 1, "Vuelvo a ganar el gimnasio facil");
+    afirmar(avanzar_gimnasio(juego) == 0, "Puedo avanzar al siguiente gimnasio");
 
     afirmar(entrenador_pokemon_party(personaje_principal(juego)) == 6,
             "Mi personaje tiene 6 Pokémon");
@@ -677,9 +683,40 @@ void pruebas_con_null()
     afirmar(funcion_batalla_5(NULL, pkm_2) == GANO_SEGUNDO,
             "Funcion batalla 1: Gana segundo");
 
-    /**
-     * agregar todas las funciones de juego.h
-     */
+    afirmar(pokemon_ataque(NULL) == ERROR, "El ataque de un Pokémon NULL devuelve error");
+    afirmar(pokemon_defensa(NULL) == ERROR, "La defensa de un Pokémon NULL devuelve error");
+    afirmar(pokemon_velocidad(NULL) == ERROR, "La velocidad de un Pokémon NULL devuelve error");
+    afirmar(pokemon_tipo_principal(NULL) == (char)0, "El tipo primario de un Pokémon NULL devuelve '\\0'");
+    afirmar(pokemon_tipo_secundario(NULL) == (char)0, "El tipo secundario de un Pokémon NULL devuelve '\\0'");
+    afirmar(pokemon_en_party(NULL) == false, "Un Pokémon NULL no está en party");
+
+    afirmar(entrenador_pokemon_party(NULL) == 0, "Un entrenador NULL no tiene Pokémon");
+    afirmar(entrenador_pokemon_restantes(NULL) == 0, "Un entrenador NULL no tiene Pokémon restantes");
+    //afirmar(entrenador_recorrer_party(NULL, NULL, NULL) == 0, "Un entrenador NULL se puede recorrer");
+    //afirmar(entrenador_recorrer_pokemon(NULL, NULL, NULL) == 0, "Un entrenador NULL se puede recorrer");
+    
+    afirmar(gimnasio_id_funcion(NULL) == ERROR, "La id de un gimnasio NULL es -1");
+    afirmar(gimnasio_entrenadores(NULL) == 0, "Un gimnasio NULL tiene 0 entrenadores");
+    afirmar(gimnasio_derrotado(NULL) == false, "Un gimnasio NULL no está derrotado");
+
+    afirmar(juego_gimnasios(NULL) == 0, "Un juego NULL tiene 0 gimnasios");
+    afirmar(juego_nuevo(NULL, "Bor") == -1, "No puedo crear una partida sin una instancia de juego");
+
+    afirmar(gimnasio_actual(NULL) == NULL, "El gimnasio actual sin juego es NULL");
+    afirmar(rival_actual(NULL) == NULL, "El rival actual sin juego es NULL");
+    afirmar(pokemon_enemigo(NULL) == NULL, "El Pokémon enemigo actual sin juego es NULL");
+    afirmar(personaje_principal(NULL) == NULL, "El personaje principal sin juego es NULL");
+    afirmar(pokemon_jugador(NULL) == NULL, "El Pokémon del jugador sin juego es NULL");
+
+    afirmar(retar_gimnasio(NULL, NULL) == 0, "Retar un gimnasio sin juego devuelve 0 (ganadores)");
+    afirmar(quitar_del_party(NULL, 0) == -1, "Quitar del party sin juego devuelve -1");
+    afirmar(agregar_al_party(NULL, 0) == -1, "Agregar al party sin juego devuelve -1");
+    afirmar(tomar_pokemon(NULL, 0) == -1, "Tomar del party sin juego devuelve -1");
+    afirmar(avanzar_gimnasio(NULL) == -1, "Avanzar un gimnasi sin juego devuelve -1");
+
+    afirmar(cargar_gimnasios(NULL, 0) == -1, "Cargar gimnasio sin juego devuelve -1");
+    afirmar(cargar_jugador(NULL, 0) == -1, "Cargar jugador sin juego devuelve -1");
+    afirmar(guardar_jugador(NULL, 0) == -1, "Guardar jugador sin juego devuevle -1");
 
     pokemon_liberar(pkm_1);
     pokemon_liberar(pkm_2);

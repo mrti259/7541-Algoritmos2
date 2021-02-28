@@ -341,14 +341,14 @@ void entrenador_recorrer_party(entrenador_t* entrenador, void (*funcion)(pokemon
 /**
  * Definido en juego.h
  */
-void entrenador_recorrer_pokemon(entrenador_t* entrenador, void (*mostrar)(pokemon_t*, void*), void* contexto)
+void entrenador_recorrer_pokemon(entrenador_t* entrenador, void (*funcion)(pokemon_t*, void*), void* contexto)
 {
-    if (!entrenador || !entrenador->pkm_obtenidos || !mostrar)
+    if (!entrenador || !entrenador->pkm_obtenidos || !funcion)
     {
         return;
     }
 
-    entrenador_recorrer_lista(entrenador->pkm_obtenidos, mostrar, contexto);
+    entrenador_recorrer_lista(entrenador->pkm_obtenidos, funcion, contexto);
 }
 
 /**
@@ -691,14 +691,14 @@ int combate_pokemon(juego_t* juego, void (*mostrar)(juego_t*))
         return 0;
     }
 
-    if (mostrar) mostrar(juego);
-
     int resultado = funcion_batalla_controller(gimnasio->id_funcion, pokemon_1, pokemon_2);
 
     if (gana_pokemon_1(resultado) && pokemon_puede_subir_estadisticas(pokemon_1))
     {
         pokemon_subir_estadisticas(pokemon_1);
     }
+
+    if (mostrar) mostrar(juego);
 
     return resultado;
 }
@@ -756,9 +756,9 @@ int retar_gimnasio(juego_t* juego, void (*mostrar)(juego_t*))
         juego_borrar_gimnasio(juego);
     }
 
-    gimnasio_t* gimnasio;
+    gimnasio_t* gimnasio = gimnasio_actual(juego);
 
-    if (!(gimnasio = gimnasio_actual(juego)))
+    if (!gimnasio)
     {
         return 0;
     }
@@ -832,7 +832,15 @@ int tomar_pokemon(juego_t* juego, size_t posicion)
         return ERROR;
     }
 
-    return SIN_ERROR;
+    return juego_borrar_gimnasio(juego);
+}
+
+/**
+ * Definido en juego.h
+ */
+int avanzar_gimnasio(juego_t* juego)
+{
+    return gimnasio_derrotado(gimnasio_actual(juego)) ? juego_borrar_gimnasio(juego) : ERROR;
 }
 
 /*******************************************************************************

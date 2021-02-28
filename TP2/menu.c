@@ -428,7 +428,7 @@ void pantalla_ver_personaje(juego_t* juego)
     texto(" en tu party y ");
     printf("%i", cantidad - pkm_party);
     texto(" en tu caja\n");
-    tabla_pokemon("Mi equipo");
+    tabla_pokemon("Tu equipo");
     entrenador_recorrer_party(personaje_principal(juego), mostrar_pokemon_tabla, &n);
 }
 
@@ -489,7 +489,7 @@ void pantalla_gimnasio(juego_t* juego)
     printf("%i", (int) gimnasio_entrenadores(gimnasio));
     texto(" entrenadores\n");
     borde_vertical();
-    texto("La función de batalla tiene id: ");
+    texto("La función de batalla tiene id ");
     printf("%i\n", gimnasio_id_funcion(gimnasio));
 }
 
@@ -538,7 +538,16 @@ void pantalla_batalla(juego_t* juego)
     entrenador_nombre(rival, str);
     borde_vertical();
     texto("Combates contra ");
-    printf("%s\n", str);
+    if (gimnasio_entrenadores(gimnasio) == 1)
+    {
+        COLORIZE(RED, "Líder ");
+        COLORIZE(RED, str);
+    }
+    else
+    {
+        printf("Entrenador %s", str);
+    }
+    printf("\n");
     borde_vertical();
     texto("Tiene ");
     printf("%i", restantes_rival);
@@ -552,7 +561,7 @@ void pantalla_batalla(juego_t* juego)
 
     pokemon_nombre(pkm_jugador, str);
     borde_vertical();
-    texto("Pokémon actual: ");
+    texto("\n" B_VERTICAL "Pokémon actual: ");
     printf("%s\n", str);
     borde_vertical();
     texto("Tenés ");
@@ -741,8 +750,7 @@ void menu_inicio(juego_t* juego)
         printf("%s", nombre);
         texto("! Tenés ");
         printf("%i", pkm_cargados);
-        texto(" Pokémon cargado");
-        texto(pkm_cargados == 1 ? "" : "s");
+        texto(" Pokémon");
     }
     texto("!\n");
 
@@ -865,9 +873,7 @@ void menu_gimnasio(juego_t* juego)
     }
 
     borde_superior();
-    pantalla_gimnasio(juego);
-
-    borde_medio();
+    texto("Preparate para el próximo gimnasio");
     borde_vertical();
     texto("¿Que desea hacer?\n");
     borde_medio();
@@ -904,6 +910,7 @@ void menu_victoria_controller(char opcion, juego_t* juego)
     {
         case PEDIR_POKEMON:
             pantalla_pedir_pokemon(juego);
+            avanzar_gimnasio(juego);
             menu_victoria(juego);
             return;
         case CAMBIAR_EQUIPO:
@@ -911,14 +918,15 @@ void menu_victoria_controller(char opcion, juego_t* juego)
             menu_victoria(juego);
             return;
         case PROXIMO_GIMNASIO:
-            if (retar_gimnasio(juego, menu_gimnasio) == 0)
+            avanzar_gimnasio(juego);
+            if (!gimnasio_actual(juego))
             {
                 borde_superior();
                 pantalla_victoria();
-                borde_medio();
-                pantalla_guardar_jugador(juego);
                 borde_inferior();
+                return;
             }
+            menu_gimnasio(juego);
             return;
     }
 }

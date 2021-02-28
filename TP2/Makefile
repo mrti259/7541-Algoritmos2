@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0 -o
 VAL = valgrind
-VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes
+VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
 EXEC = juego.bin
 EXEC_TEST = pruebas.bin
 CFILES = tda/*.c juego.c batallas.c menu.c main.c

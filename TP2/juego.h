@@ -164,7 +164,12 @@ entrenador_t* personaje_principal(juego_t*);
 pokemon_t* pokemon_jugador(juego_t*);
 
 /**
- * Inicia las batallas contra un gimnasio,
+ * Inicia las batallas contra un gimnasio hasta que no puede combatirse más.
+ * Devuelve > 0 si gana el personaje principal o < 0 si gana el gimnasio.
+ * Si no se puede pelear, devuelve 0 -> no hubo combate.
+ *
+ * Puede recibir una función para mostrar individualmente cada batalla que
+ * recibe la instancia del juego.
  */
 int retar_gimnasio(juego_t*, void (*mostrar)(juego_t*));
 
@@ -182,6 +187,11 @@ int agregar_al_party(juego_t*, size_t posicion);
  * Toma un Pokémon del líder del gimnasio si este fue vencido. Devuelve -1 si falla.
  */
 int tomar_pokemon(juego_t*, size_t posicion);
+
+/**
+ * Si el gimnasio actual ya fue derrotado, avanza al siguiente.
+ */
+int avanzar_gimnasio(juego_t*);
 
 /**
  * Carga informacion de gimnasios, entrenadores y pokemon de un archivo al

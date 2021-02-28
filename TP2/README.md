@@ -81,7 +81,7 @@ Están limitados a cargar con ellos hasta 6 Pokémon que serán almacenados en s
 Pokébolas, pero pueden tener más que quedarán a cargo de un profesor Pokémon
 que les garantizará cuidado y al menos 20 minutos al sol por día.
 
-Para llevar la cuenta de los Pokemón que poseen en su totalidad o en su party,
+Para llevar la cuenta de los Pokémon que poseen en su totalidad o en su party,
 se hace uso de listas.
 
 Las listas son la mejor forma de representar estas estructuras porque el
@@ -116,7 +116,7 @@ entrenador, primero hay que vencerlo. Por lo tanto, primero se combate y si el
 usuario resulta ganador, se borra lo borra.
 
 Sobre el líder se hace una excepción porque después de vencerlo se tiene la
-posibilidad de tomar uno de sus Pokemón. Por este motivo, antes de borrarlo y
+posibilidad de tomar uno de sus Pokémon. Por este motivo, antes de borrarlo y
 borrar el gimnasio, se lo conserva, se marca el gimnasio como derrotado y se lo
 deja en ese estado hasta que se decida enfrentar un nuevo gimnasio o se tome un
 Pokémon.

@@ -71,7 +71,7 @@ void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
 /**
  * Devuelve la cantidad de pokemon que tiene el entrenador en su party.
  */
-size_t entrenador_party(entrenador_t*);
+size_t entrenador_pokemon_party(entrenador_t*);
 
 /**
  * Devuelve la cantidad de Pokémon que le quedan al entrenador para combatir.
@@ -176,7 +176,7 @@ int quitar_del_party(juego_t*, size_t posicion);
 /**
  * Agrega un Pokémon de la caja del jugador a su party. Devuelve -1 si falla.
  */
-int agregar_a_party(juego_t*, size_t posicion);
+int agregar_al_party(juego_t*, size_t posicion);
 
 /**
  * Toma un Pokémon del líder del gimnasio si este fue vencido. Devuelve -1 si falla.

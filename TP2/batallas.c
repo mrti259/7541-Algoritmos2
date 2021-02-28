@@ -45,9 +45,7 @@ int funcion_batalla_1(void* pkm_1, void* pkm_2)
         dmg_2 = ataque_2 - defensa_1 ; // daño causado por pkm_2
 
     if (dmg_1 == dmg_2 && (velocidad_1 > velocidad_2))
-    {
         return GANO_PRIMERO;
-    }
 
     return  dmg_1 > dmg_2 ? GANO_PRIMERO : GANO_SEGUNDO;
 }
@@ -85,9 +83,8 @@ int funcion_batalla_3(void* pkm_1, void* pkm_2)
 
     // Gana menor dif entre ataque y velocidad
     if (-dif_2 < dif_1 && dif_1 < dif_2)
-    {
         pts_1++;
-    }
+
     // Gana el más gordito -> mayor defensa
     defensa_1 > defensa_2 ? pts_1++ : 0;
 
@@ -103,10 +100,10 @@ int rareza(char tipo)
     {
         case ELECTRICO:
         case SINIESTRO:
-            return 12;
+            return 10;
         case FANTASMA:
         case PSIQUICO:
-            return 10;
+            return 9;
         case DRAGON:
         case MAGICO:
         case TOXICO:
@@ -120,6 +117,7 @@ int rareza(char tipo)
         case AGUA:
         case HOJA:
         case ROCA:
+        case NORMAL:
             return 4;
         default:
             return 2;
@@ -159,27 +157,19 @@ int funcion_batalla_5(void* pkm_1, void* pkm_2)
 
     // Gana si tiene nombre más corto
     if (strlen(nombre_1) < strlen(nombre_2))
-    {
         pts_1++;
-    }
 
     // Gana si tiene buen flow
     if (pokemon_velocidad(p_1) > pokemon_velocidad(p_2))
-    {
         pts_1++;
-    }
 
     // Gana si resiste los beef de su oponente
     if (pokemon_defensa(p_1) > pokemon_ataque(p_2))
-    {
         pts_1++;
-    }
 
     // Gana si humilla a su oponente
     if (pokemon_ataque(p_1) > pokemon_defensa(p_2))
-    {
         pts_1++;
-    }
 
     return pts_1 > 2 ? GANO_PRIMERO : GANO_SEGUNDO;
 }

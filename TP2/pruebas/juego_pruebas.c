@@ -7,6 +7,27 @@
 const char *ARCHIVO = "datos.tmp", *ESCRIBIR = "w", *LEER = "r";
 
 /**
+ * Controller requerido por juego.h
+ */
+int funcion_batalla_controller(int id_funcion, pokemon_t* pokemon_1, pokemon_t* pokemon_2)
+{
+    if (id_funcion < 1 || id_funcion > 5)
+    {
+        return 0;
+    }
+
+    int (*funcion_batalla[])(void*, void*) = {
+        funcion_batalla_1,
+        funcion_batalla_2,
+        funcion_batalla_3,
+        funcion_batalla_4,
+        funcion_batalla_5
+    };
+
+    return funcion_batalla[id_funcion - 1](pokemon_1, pokemon_2);
+}
+
+/**
  * Pruebas de Pokémon.
  * Si se crea correctamente, se setean sus valores y se verifica que sus
  * funciones devuelvan los valores correctos.
@@ -112,13 +133,13 @@ void pruebas_entrenador()
 
     afirmar(entrenador_pokemon_obtenidos(entrenador) == 2,
             "El entrenador tiene 2 Pokémon en total");
-    afirmar(entrenador_party(entrenador) == 2, "Tiene 2 Pokémon en el party");
+    afirmar(entrenador_pokemon_party(entrenador) == 2, "Tiene 2 Pokémon en el party");
 
     for (int i = 0; i < 10; i++)
         entrenador_agregar_pokemon(entrenador, pokemon_crear());
 
     afirmar(entrenador_pokemon_obtenidos(entrenador) == 12 , "Ahora tiene 12 Pokémon en total");
-    afirmar(entrenador_party(entrenador) == 6 , "Tiene 6 Pokémon en el party");
+    afirmar(entrenador_pokemon_party(entrenador) == 6 , "Tiene 6 Pokémon en el party");
 
     entrenador_liberar(entrenador);
 }
@@ -565,10 +586,12 @@ void pruebas_jugabilidad()
     afirmar(pokemon_jugador(juego)->adicional == 6,
             "El primer Pokémon del personaje ganó 6 combates");
 
+    afirmar(tomar_pokemon(juego, 3) == -1,
+            "No puedo tomar un Pokémon que no se encuentre en el party del líder");
     afirmar(tomar_pokemon(juego, 0) == 0,
-            "Puedo tomar un Pokemón después de vencer un gimnasio");
-    afirmar(tomar_pokemon(juego, 0 ) == -1,
-            "No puedo tomar otro Pokemón");
+            "Puedo tomar un Pokémon después de vencer un gimnasio");
+    afirmar(tomar_pokemon(juego, 0) == -1,
+            "No puedo tomar otro Pokémon");
     afirmar(strcmp(gimnasio_actual(juego)->nombre, "Gimnasio de Ciudad Carmín") == 0,
             "El próximo gimnasio es el de Ciudad Carmín");
     afirmar(strcmp(rival_actual(juego)->nombre, "Caballero Tito") == 0,
@@ -577,29 +600,29 @@ void pruebas_jugabilidad()
     afirmar(retar_gimnasio(juego, NULL) == -1,
             "El personaje no puede vencer el gimnasio con su equipo");
 
-    afirmar(entrenador_party(personaje_principal(juego)) == 6,
+    afirmar(entrenador_pokemon_party(personaje_principal(juego)) == 6,
             "Mi personaje tiene 6 Pokémon");
     afirmar(strcmp(pokemon_jugador(juego)->nombre, "Pikachu") == 0,
-            "El Pokemon actual es Pikachu");
+            "El Pokémon actual es Pikachu");
     afirmar(quitar_del_party(juego, 0) == 0,
             "Quite del party al primer Pokémon del jugador");
 
     afirmar(strcmp(pokemon_jugador(juego)->nombre, "Butterfree") == 0,
-            "El Pokemon actual es Butterfree");
+            "El Pokémon actual es Butterfree");
     afirmar(quitar_del_party(juego, 0) == 0,
             "Quite a Butterfree");
-    afirmar(entrenador_party(personaje_principal(juego)) == 4,
+    afirmar(entrenador_pokemon_party(personaje_principal(juego)) == 4,
             "Mi personaje tiene 4 Pokémon");
     afirmar(strcmp(pokemon_jugador(juego)->nombre, "Pidgeotto") == 0,
-            "El Pokemon actual es Pidgeotto");
+            "El Pokémon actual es Pidgeotto");
 
-    afirmar(agregar_a_party(juego, 3) == -1,
+    afirmar(agregar_al_party(juego, 3) == -1,
             "El Pokémon que se intenta agregar ya esta en el party");
-    afirmar(agregar_a_party(juego, 4) == 0,
+    afirmar(agregar_al_party(juego, 4) == 0,
             "Se agrega un Pokémon de la caja al party");
-    afirmar(entrenador_party(personaje_principal(juego)) == 5,
-            "Mi personaje ahora tiene 5 Pokemón");
-    afirmar(agregar_a_party(juego, 4) == -1,
+    afirmar(entrenador_pokemon_party(personaje_principal(juego)) == 5,
+            "Mi personaje ahora tiene 5 Pokémon");
+    afirmar(agregar_al_party(juego, 4) == -1,
             "Se intenta agregar otra vez un Pokémon que ya esta en el party");
 
     juego_liberar(juego);

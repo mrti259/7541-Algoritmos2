@@ -14,12 +14,14 @@
 #define PEDIR ": "
 #define SALIR "Q"
 #define MAX_RUTA 100
-#define MAX_ARCHIVO 32
+#define MAX_ARCHIVO 33
 #define MAX_CAJA 20
-#define ARCHIVO_FORMATO "%31s"
+#define ARCHIVO_FORMATO "%32s"
 #define NOMBRE_FORMATO "%25s"
 #define ORIGEN_JUGADOR "./datos/jugador/"
 #define ORIGEN_GIMNASIOS "./datos/gimnasios/"
+const char TABLA_CABECERA[] = YELLOW " %50s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s\n" TEXT_RESET,
+           TABLA_POKEMON[] = YELLOW " %50s " B_VERTICAL "  %c " B_VERTICAL "  %c " B_VERTICAL " %3i " B_VERTICAL " %3i " B_VERTICAL " %3i\n" TEXT_RESET;
 
 enum teclas
 {
@@ -145,7 +147,7 @@ void titulo_pantalla(const char* titulo)
 }
 
 /**
- * Imprime un caracter de color verde para destacar y una descripcion de color amarillo.
+ * Imprime un carácter de color verde para destacar y una descripción de color amarillo.
  */
 void mostrar_opcion(char opcion, const char* descripcion)
 {
@@ -192,7 +194,7 @@ void mostrar_archivos(char directorio[MAX_NOMBRE])
 }
 
 /**
- * Pide un caracter por pantalla. Debe recibir una función que valide el dato
+ * Pide un carácter por pantalla. Debe recibir una función que valide el dato
  * ingresado. Retorna una de las opciones válidas.
  */
 char pedir_tecla(bool es_valido(char))
@@ -211,7 +213,7 @@ char pedir_tecla(bool es_valido(char))
 }
 
 /**
- * Valida si el caracter ingresado es SI o NO.
+ * Valida si el carácter ingresado es SI o NO.
  */
 bool confirmacion(char opcion)
 {
@@ -247,8 +249,9 @@ void pantalla_crear_jugador(juego_t* juego)
 }
 
 /**
- * Muestra cuáles son los archivos de jugadores disponibles y le pide
- * al usuario que ingrese cuál es el que desea cargar. Si no puede abrirlo,
+ * Muestra cuáles son los archivos de jugadores disponibles en el archivo
+ * ORIGEN_JUGADOR y le pide al usuario que ingrese cuál es el que desea cargar.
+ * Si no puede abrirlo,
  * puede crear un nuevo personaje.
  */
 void pantalla_cargar_jugador(juego_t* juego)
@@ -283,7 +286,8 @@ void pantalla_cargar_jugador(juego_t* juego)
 }
 
 /**
- *
+ * Imprime los archivos del directorio ORIGEN_GIMNASIOS y le da la opción al
+ * jugador de cargar los archivos que desee.
  */
 void pantalla_agregar_gimnasios(juego_t* juego)
 {
@@ -323,7 +327,7 @@ void pantalla_agregar_gimnasios(juego_t* juego)
 }
 
 /**
- *
+ * Enumera e imprime los Pokémon del party.
  */
 void mostrar_pokemon_party(pokemon_t* pokemon, void* contexto)
 {
@@ -331,7 +335,7 @@ void mostrar_pokemon_party(pokemon_t* pokemon, void* contexto)
 
     borde_vertical();
     char str[MAX_NOMBRE + 10],
-    formato[] = "%3i. %50s",
+    formato[] = "%3i. %s",
     nombre[MAX_NOMBRE];
     pokemon_nombre(pokemon, nombre);
     (*(int*)contexto)++;
@@ -340,7 +344,7 @@ void mostrar_pokemon_party(pokemon_t* pokemon, void* contexto)
 }
 
 /**
- *
+ * Enumera e imprime los Pokémon de la caja.
  */
 void mostrar_pokemon_caja(pokemon_t* pokemon, void* contexto)
 {
@@ -359,50 +363,41 @@ void mostrar_pokemon_caja(pokemon_t* pokemon, void* contexto)
 }
 
 /**
- * Imprime una fila de la table con información del Pokémon.
+ * Imprime una fila de la tabla con información del Pokémon.
  */
 void mostrar_pokemon_tabla(pokemon_t* pokemon, void* contexto)
 {
     char nombre[MAX_NOMBRE];
     pokemon_nombre(pokemon, nombre);
     borde_vertical();
-    printf(YELLOW " %50s " B_VERTICAL "  %c " B_VERTICAL "  %c " B_VERTICAL " %3i " B_VERTICAL " %3i " B_VERTICAL " %3i\n" TEXT_RESET,
-            nombre, pokemon_tipo_principal(pokemon), pokemon_tipo_secundario(pokemon),
-            pokemon_ataque(pokemon), pokemon_defensa(pokemon), pokemon_velocidad(pokemon));
+    printf(TABLA_POKEMON, nombre, pokemon_tipo_principal(pokemon),
+            pokemon_tipo_secundario(pokemon), pokemon_ataque(pokemon),
+            pokemon_defensa(pokemon), pokemon_velocidad(pokemon));
 }
 
 /**
- *
+ * Crea el encabezado para la tabla de Pokémon
  */
 void tabla_pokemon(juego_t* juego, const char* titulo, entrenador_t* entrenador)
 {
     borde_vertical();
     titulo_pantalla(titulo);
     borde_vertical();
-    printf(YELLOW " %50s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s\n" TEXT_RESET,
-            "Nombre", "T1", "T2", "Att", "Def", "Vel");
+    printf(TABLA_CABECERA, "Nombre", "T1", "T2", "Att", "Def", "Vel");
 }
 
 /**
- *
+ * Imprime los Pokémon del equipo del jugador.
  */
-void pantalla_equipo(juego_t* juego)
+void pantalla_ver_equipo(juego_t* juego)
 {
     tabla_pokemon(juego, "Mi equipo", personaje_principal(juego));
     entrenador_mostrar_party(personaje_principal(juego), mostrar_pokemon_tabla, NULL);
 }
 
 /**
- *
- */
-void pantalla_obtenidos(juego_t* juego)
-{
-    tabla_pokemon(juego, "Mis Pokémon", personaje_principal(juego));
-    entrenador_mostrar_pokemon(personaje_principal(juego), mostrar_pokemon_tabla, NULL);
-}
-
-/**
- *
+ * Muestra los Pokémon del party y permite al usuario sacar uno.
+ * Muestra los Pokémon de la caja y permite al usuario agregar uno al party.
  */
 void pantalla_cambiar_equipo(juego_t* juego)
 {
@@ -434,11 +429,11 @@ void pantalla_cambiar_equipo(juego_t* juego)
         scanf("%3s", str); // para prevenir overflow
         posicion = (size_t) atoi(str);
     }
-    while (agregar_a_party(juego, posicion - 1));
+    while (agregar_al_party(juego, posicion - 1));
 }
 
 /**
- *
+ * Muestra información del gimnasio.
  */
 void pantalla_gimnasio(juego_t* juego)
 {
@@ -458,6 +453,9 @@ void pantalla_gimnasio(juego_t* juego)
     printf("%i\n", gimnasio_id_funcion(gimnasio));
 }
 
+/**
+ * Muestra información del rival.
+ */
 void pantalla_rival(juego_t* juego)
 {
     char nombre[MAX_NOMBRE];
@@ -469,7 +467,7 @@ void pantalla_rival(juego_t* juego)
     printf("%s\n", nombre);
     borde_vertical();
     texto("Cuenta con ");
-    printf("%i", (int) entrenador_party(rival));
+    printf("%i", (int) entrenador_pokemon_party(rival));
     texto(" Pokémon\n");
 
     borde_medio();
@@ -512,7 +510,60 @@ void pantalla_batalla(juego_t* juego)
 }
 
 /**
- *
+ * Muestra los Pokémon del líder en pantalla y le da la opción al jugador
+ * de elegir cuál prefiere tomar prestado.
+ */
+void pantalla_pedir_pokemon(juego_t* juego)
+{
+    if (!gimnasio_derrotado(gimnasio_actual(juego)))
+    {
+        return;
+    }
+    char nombre[MAX_NOMBRE];
+    entrenador_nombre(rival_actual(juego), nombre);
+
+    size_t n = 0;
+    borde_superior();
+    borde_vertical();
+    texto("Toma un Pokémon de ");
+    printf("%s\n", nombre);
+    entrenador_mostrar_party(rival_actual(juego), mostrar_pokemon_party, &n);
+    do
+    {
+        printf(PEDIR);
+        scanf("%lu", &n); // ~> no es portable
+    }
+    while (tomar_pokemon(juego, n));
+}
+
+/**
+ * Mensaje a mostrar cuando se vencen todos los gimnasios.
+ */
+void pantalla_victoria(juego_t* juego)
+{
+    borde_vertical();
+    texto("FELICIDADES! Has derrotado todos los gimnasios!\n");
+    borde_vertical();
+    texto("Recuerda combatir a la Elite Four para\n");
+    borde_vertical();
+    texto("convertirte en Maestro Pokémon!\n");
+}
+
+/**
+ * Mensaje a mostrar cuando se abandona.
+ */
+void pantalla_derrota(juego_t* juego)
+{
+    borde_vertical();
+    texto("Perdiste...\n");
+    borde_vertical();
+    texto("Todavía te falta madera para convertirte en Maestro Pokémon!\n");
+}
+
+/**
+ * Muestra como el personaje principal avanza en su aventura con su equipo
+ * si darle la opción al usuario de intervenir. Si pierde un enfrentamiento
+ * termina la Simulación, si no continúa hasta convertise en campeón.
  */
 void pantalla_simulacion(juego_t* juego)
 {
@@ -537,55 +588,20 @@ void pantalla_simulacion(juego_t* juego)
     while (resultado > 0)
     {
         borde_vertical();
-        texto("Has vencido el gimnasio!\n");
+        COLORIZE(GREEN, "Has vencido el gimnasio!\n");
         borde_medio();
         resultado = retar_gimnasio(juego, pantalla_batalla);
     }
 
     if (!juego_gimnasios(juego))
     {
-        borde_vertical();
-        texto("FELICIDADES! Has derrotado todos los gimnasios!\n");
-        borde_vertical();
-        texto("Recuerda combatir a la Elite Four para\n");
-        borde_vertical();
-        texto("convertirte en Maestro Pokémon!\n");
+        pantalla_victoria();
     }
     else
     {
-        borde_vertical();
-        texto("Perdiste...\n");
-        borde_vertical();
-        texto("Todavía te falta madera para convertirte en Maestro Pokémon!\n");
+        pantalla_derrota();
     }
     borde_inferior();
-}
-
-/**
- *
- */
-void pantalla_pedir_pokemon(juego_t* juego)
-{
-    if (!gimnasio_derrotado(gimnasio_actual(juego)))
-    {
-        return;
-    }
-    char nombre[MAX_NOMBRE];
-    entrenador_nombre(rival_actual(juego), nombre);
-
-    size_t n = 0;
-    borde_superior();
-    borde_vertical();
-    titulo_pantalla("Toma un Pokémon de ");
-    printf("%s\n", nombre);
-    entrenador_mostrar_party(rival_actual(juego), mostrar_pokemon_party, &n);
-    do
-    {
-        char str[10] = "";
-        scanf("%3s", str); // para prevenir overflow
-        n = (size_t) atoi(str);
-    }
-    while (tomar_pokemon(juego, n));
 }
 
 /**
@@ -604,10 +620,10 @@ void pantalla_final(juego_t* juego)
     {
         borde_vertical();
         texto("Ingrese un nombre para el archivo que desea guardar:\n");
-        char nombre[MAX_ARCHIVO];
+        char nombre[MAX_ARCHIVO], ruta[MAX_RUTA] = ORIGEN_JUGADOR;
         printf(PEDIR);
         scanf(ARCHIVO_FORMATO, nombre);
-        if (guardar_jugador(nombre, juego))
+        if (guardar_jugador(strcat(ruta, nombre), juego))
         {
             borde(RED, B_VERTICAL);
             COLORIZE(RED_BOLD, "Ocurrió un error al guardar la partida\n");
@@ -622,7 +638,8 @@ void pantalla_final(juego_t* juego)
 }
 
 /**
- * Devuelve true a las opciones validas del menu_inicio
+ * Valida si la opcion elegida por el usuario está contemplada en el menu de
+ * inicio.
  */
 bool menu_inicio_opcion_valido(char opcion)
 {
@@ -639,7 +656,7 @@ bool menu_inicio_opcion_valido(char opcion)
 }
 
 /**
- * Realiza una de las acciones del menu inicio.
+ * Controlador de las acciones del menu de inicio.
  */
 void menu_inicio_controller(char opcion, juego_t* juego)
 {
@@ -663,11 +680,12 @@ void menu_inicio_controller(char opcion, juego_t* juego)
 }
 
 /**
- *
+ * Menú inicial. Da las opciones para que el jugador pueda crear su partida a
+ * su gusto.
  */
 void menu_inicio(juego_t* juego)
 {
-    char nombre[MAX_NOMBRE] = "";
+    char nombre[MAX_NOMBRE];
     entrenador_nombre(personaje_principal(juego), nombre);
     int cargados = (int) juego_gimnasios(juego);
 
@@ -696,7 +714,8 @@ void menu_inicio(juego_t* juego)
 }
 
 /**
- *
+ * Valida si la opcion ingresada por el usuario está contemplada en el menu de
+ * batalla.
  */
 bool menu_batalla_opcion_valido(char opcion)
 {
@@ -710,7 +729,7 @@ bool menu_batalla_opcion_valido(char opcion)
 }
 
 /**
- *
+ * Menú de batalla a mostrar durante un enfrentamiento.
  */
 void menu_batalla(juego_t* juego)
 {
@@ -725,7 +744,8 @@ void menu_batalla(juego_t* juego)
 }
 
 /**
- *
+ * Valida si la opcion ingresada por el usuario está contemplada en el menu de
+ * gimnasio.
  */
 bool menu_gimnasio_opcion_valido(char opcion)
 {
@@ -742,22 +762,7 @@ bool menu_gimnasio_opcion_valido(char opcion)
 }
 
 /**
- *
- */
-bool menu_gimnasio_opcion_valido_extras(char opcion)
-{
-    switch(opcion)
-    {
-        case VER_VICTORIAS:
-        case VER_DERROTAS:
-            return true;
-        default:
-            return menu_gimnasio_opcion_valido(opcion);
-    }
-}
-
-/**
- *
+ * Controlador de acciones del menu de gimnasio.
  */
 void menu_gimnasio_controller(char opcion, juego_t* juego)
 {
@@ -765,7 +770,7 @@ void menu_gimnasio_controller(char opcion, juego_t* juego)
     {
         case VER_EQUIPO:
             borde_superior();
-            pantalla_equipo(juego);
+            pantalla_ver_equipo(juego);
             menu_controller(I_GIMNASIO, juego);
             return;
         case VER_GIMNASIO:
@@ -788,7 +793,7 @@ void menu_gimnasio_controller(char opcion, juego_t* juego)
 }
 
 /**
- *
+ * Menú de gimnasio.
  */
 void menu_gimnasio(juego_t* juego)
 {
@@ -820,7 +825,7 @@ void menu_gimnasio(juego_t* juego)
 }
 
 /**
- *
+ * Valida si la opcion elegida por el jugador esta contemplada en el menu de victoria
  */
 bool menu_victoria_opcion_valido(char opcion)
 {
@@ -836,7 +841,7 @@ bool menu_victoria_opcion_valido(char opcion)
 }
 
 /**
- *
+ * Controlador de acciones del menu de victoria.
  */
 void menu_victoria_controller(char opcion, juego_t* juego)
 {
@@ -857,7 +862,7 @@ void menu_victoria_controller(char opcion, juego_t* juego)
 }
 
 /**
- *
+ * Menú a mostrar cuando el jugador gana un gimnasio.
  */
 void menu_victoria(juego_t* juego)
 {
@@ -877,7 +882,7 @@ void menu_victoria(juego_t* juego)
 }
 
 /**
- *
+ * Valida que la opción elegida este contemplada en el menu derrota.
  */
 bool menu_derrota_opcion_valido(char opcion)
 {
@@ -893,7 +898,7 @@ bool menu_derrota_opcion_valido(char opcion)
 }
 
 /**
- *
+ * Controlador de acciones del menu derrota.
  */
 void menu_derrota_controller(char opcion, juego_t* juego)
 {
@@ -908,14 +913,13 @@ void menu_derrota_controller(char opcion, juego_t* juego)
             menu_controller(I_GIMNASIO, juego);
             return;
         case FINALIZAR_PARTIDA:
-            borde_inferior();
             pantalla_final(juego);
             return;
     }
 }
 
 /**
- *
+ * Menú a mostrar cuando el jugador pierde un enfrentamiento.
  */
 void menu_derrota(juego_t* juego)
 {

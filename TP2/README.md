@@ -31,7 +31,7 @@ Ahora en una consola ejecuta el siguiente comando:
 
 ## Desarrollo
 
-En `inicio.c` se brindan las funciones que permiten darle una interfaz por
+En `menu.c` se brindan las funciones que permiten darle una interfaz por
 consola al programa para facilitar su jugabilidad. Está hecho a modo de
 ejemplo, ya sé que es horrible en tanto apariencia y en código.
 
@@ -49,7 +49,7 @@ Este controlador se encuentra declarado en `juego.h` de la siguiente manera:
 extern int funcion_batalla_controller(int, void*, void*);
 ```
 
-Y su implementación se encuentra en `inicio.c`.
+Y su implementación se encuentra en `main.c`.
 
 La razón por la cuál se realizó esto, es porque permite extender el juego sin
 modificar `juego.c` o `juego.h` o romper con su encapsulación. Se pueden usar

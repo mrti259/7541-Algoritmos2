@@ -4,7 +4,7 @@ VAL = valgrind
 VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes
 EXEC = juego.bin
 EXEC_TEST = pruebas.bin
-CFILES = tda/*.c juego.c batallas.c inicio.c
+CFILES = tda/*.c juego.c batallas.c menu.c main.c
 DIR_TESTS = pruebas
 
 all: build files play

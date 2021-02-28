@@ -76,14 +76,14 @@ size_t entrenador_pokemon_party(entrenador_t*);
 /**
  * Devuelve la cantidad de Pokémon que le quedan al entrenador para combatir.
  */
-size_t entrenador_pokemon_restante(entrenador_t*);
+size_t entrenador_pokemon_restantes(entrenador_t*);
 
 /**
  * Procedimiento que dado un entrenador y una funcion para mostrar
  * información de Pokémon, recorre el party del entrenador y los muestra.
  * Admite un puntero de contexto que puede ser utilizado por la función mostrar.
  */
-void entrenador_mostrar_party(entrenador_t*, void (*mostrar)(pokemon_t*, void*), void*);
+void entrenador_recorrer_party(entrenador_t*, void (*mostrar)(pokemon_t*, void*), void*);
 
 /**
  * Procedimiento que dado un entrenador y una funcion para mostrar
@@ -91,7 +91,7 @@ void entrenador_mostrar_party(entrenador_t*, void (*mostrar)(pokemon_t*, void*),
  * entrenador y los muestra.
  * Admite un puntero de contexto que puede ser utilizado por la función mostrar.
  */
-void entrenador_mostrar_pokemon(entrenador_t*, void (*mostrar)(pokemon_t*, void*), void*);
+void entrenador_recorrer_pokemon(entrenador_t*, void (*mostrar)(pokemon_t*, void*), void*);
 
 /**
  * Copia el nombre del gimnasio o lo deja en blanco ("") si falla.

@@ -202,7 +202,7 @@ size_t entrenador_pokemon_obtenidos(entrenador_t* entrenador)
 /**
  * Definido en juego.h
  */
-size_t entrenador_pokemon_restante(entrenador_t* entrenador)
+size_t entrenador_pokemon_restantes(entrenador_t* entrenador)
 {
     return entrenador ?
         entrenador_pokemon_party(entrenador) - entrenador->pkm_actual : 0;
@@ -314,12 +314,12 @@ int entrenador_agregar_pokemon(entrenador_t* entrenador, pokemon_t* pokemon)
  * Recorre una lista de Pokémon y las muestra. Los parámetros no pueden ser
  * NULL.
  */
-void entrenador_recorrer_pokemon(lista_t* pkm, void (*mostrar)(pokemon_t*, void*), void* contexto)
+void entrenador_recorrer_lista(lista_t* pkm, void (*funcion)(pokemon_t*, void*), void* contexto)
 {
     lista_iterador_t* iterador = lista_iterador_crear(pkm);
     while (lista_iterador_tiene_siguiente(iterador))
     {
-        mostrar(lista_iterador_elemento_actual(iterador), contexto);
+        funcion(lista_iterador_elemento_actual(iterador), contexto);
         lista_iterador_avanzar(iterador);
     }
     lista_iterador_destruir(iterador);
@@ -328,27 +328,27 @@ void entrenador_recorrer_pokemon(lista_t* pkm, void (*mostrar)(pokemon_t*, void*
 /**
  * Definido en juego.h
  */
-void entrenador_mostrar_party(entrenador_t* entrenador, void (*mostrar)(pokemon_t*, void*), void* contexto)
+void entrenador_recorrer_party(entrenador_t* entrenador, void (*funcion)(pokemon_t*, void*), void* contexto)
 {
-    if (!entrenador || !entrenador->pkm_party || !mostrar)
+    if (!entrenador || !entrenador->pkm_party || !funcion)
     {
         return;
     }
 
-    entrenador_recorrer_pokemon(entrenador->pkm_party, mostrar, contexto);
+    entrenador_recorrer_lista(entrenador->pkm_party, funcion, contexto);
 }
 
 /**
  * Definido en juego.h
  */
-void entrenador_mostrar_pokemon(entrenador_t* entrenador, void (*mostrar)(pokemon_t*, void*), void* contexto)
+void entrenador_recorrer_pokemon(entrenador_t* entrenador, void (*mostrar)(pokemon_t*, void*), void* contexto)
 {
     if (!entrenador || !entrenador->pkm_obtenidos || !mostrar)
     {
         return;
     }
 
-    entrenador_recorrer_pokemon(entrenador->pkm_obtenidos, mostrar, contexto);
+    entrenador_recorrer_lista(entrenador->pkm_obtenidos, mostrar, contexto);
 }
 
 /**
@@ -832,7 +832,7 @@ int tomar_pokemon(juego_t* juego, size_t posicion)
         return ERROR;
     }
 
-    return juego_borrar_gimnasio(juego);
+    return SIN_ERROR;
 }
 
 /*******************************************************************************

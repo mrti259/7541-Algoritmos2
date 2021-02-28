@@ -59,6 +59,11 @@ char pokemon_tipo_principal(pokemon_t*);
 char pokemon_tipo_secundario(pokemon_t*);
 
 /**
+ * Devuelve true si le Pokémon está en un party.
+ */
+bool pokemon_en_party(pokemon_t*);
+
+/**
  * Copia el nombre del entrenador o lo deja en blanco ("") si falla.
  */
 void entrenador_nombre(entrenador_t*, char[MAX_NOMBRE]);
@@ -76,20 +81,27 @@ size_t entrenador_pokemon_restante(entrenador_t*);
 /**
  * Procedimiento que dado un entrenador y una funcion para mostrar
  * información de Pokémon, recorre el party del entrenador y los muestra.
+ * Admite un puntero de contexto que puede ser utilizado por la función mostrar.
  */
-void entrenador_mostrar_party(entrenador_t*, void (*mostrar)(pokemon_t*));
+void entrenador_mostrar_party(entrenador_t*, void (*mostrar)(pokemon_t*, void*), void*);
 
 /**
  * Procedimiento que dado un entrenador y una funcion para mostrar
  * información de Pokémon, recorre el conjunto de Pokémon obtenidos del
  * entrenador y los muestra.
+ * Admite un puntero de contexto que puede ser utilizado por la función mostrar.
  */
-void entrenador_mostrar_pokemon(entrenador_t*, void (*mostrar)(pokemon_t*));
+void entrenador_mostrar_pokemon(entrenador_t*, void (*mostrar)(pokemon_t*, void*), void*);
 
 /**
  * Copia el nombre del gimnasio o lo deja en blanco ("") si falla.
  */
 void gimnasio_nombre(gimnasio_t*, char[MAX_NOMBRE]);
+
+/**
+ * Devuelve la id de la función de batalla o -1 si falla.
+ */
+int gimnasio_id_funcion(gimnasio_t*);
 
 /**
  * Devuelve la cantidad de entrenadores que hay quedan en el gimnasio.

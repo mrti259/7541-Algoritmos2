@@ -1,21 +1,25 @@
 #include "constantes.h"
 #include "juego.h"
+#include "batallas.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include "colors.h"
+#include "borders.h"
 
 #define MAX_ANCHO 80
 #define PEDIR ": "
 #define SALIR "Q"
 #define MAX_RUTA 100
-#define MAX_ARCHIVO 21
-#define ARCHIVO_FORMATO "%30s"
-#define NOMBRE_FORMATO "%20s"
+#define MAX_ARCHIVO 32
+#define MAX_CAJA 20
+#define ARCHIVO_FORMATO "%31s"
+#define NOMBRE_FORMATO "%25s"
 #define ORIGEN_JUGADOR "./datos/jugador/"
-#define ORIGEN_GIMNASIOS "./datos/gimnasios"
+#define ORIGEN_GIMNASIOS "./datos/gimnasios/"
 
 enum teclas
 {
@@ -47,20 +51,144 @@ enum menus
     I_DERROTA
 };
 
-void controller(int, juego_t*);
+void menu_controller(int, juego_t*);
 
-int main(int argc,char** argv)
+/*
+ * Pausa el programa la cantidad de tiempo indicado.
+ * Esta función depende del sistema donde sea ejecutado por lo cual no es portable
+ * y no funcionará en sistemas Windows y otros.
+ */
+void detener_tiempo(float seg)
 {
-    juego_t* juego = juego_crear();
+    char comando[100] = "";
+    sprintf(comando, "sleep %.2f", seg);
+    system(comando);
+}
 
-    if (!juego)
-        return -1;
+/**
+ * Imprime el texto en amarillo.
+ */
+void texto(const char* texto)
+{
+    COLORIZE(YELLOW, texto);
+}
 
-    controller(I_INICIO, juego);
+/**
+ * Atajo para imprimir un borde con color.
+ */
+void borde(const char* color, const char* _borde)
+{
+    printf(color);
+    BORDER(_borde);
+    printf(TEXT_RESET);
+}
 
-    juego_liberar(juego);
+/**
+ * Imprime un borde vertical de color amarillo de una línea.
+ */
+void borde_vertical()
+{
+    borde(YELLOW, B_VERTICAL);
+}
 
-    return 0;
+/**
+ * Imprime el borde horizontal con extremos indicados ocupando el ancho máximo.
+ */
+void borde_horizontal(const char* _b_izq, const char* _b_der)
+{
+    borde(YELLOW, _b_izq);
+
+    for (int i = 0; i < MAX_ANCHO; i++)
+        borde(YELLOW, B_HORIZONTAL);
+
+    borde(YELLOW, _b_der);
+    printf("\n");
+}
+
+/**
+ * Imprime el borde superior de ancho máximo.
+ */
+void borde_superior()
+{
+    borde_horizontal(B_LEFT_TOP, B_RIGHT_TOP);
+}
+
+/**
+ * Imprime el borde inferior de ancho máximo.
+ */
+void borde_inferior()
+{
+    borde_horizontal(B_LEFT_BOTTOM, B_RIGHT_BOTTOM);
+}
+
+/**
+ * Imprime el borde medio de ancho máximo.
+ */
+void borde_medio()
+{
+    borde(YELLOW, B_LEFT_MIDDLE);
+
+    for (int i = 0; i < MAX_ANCHO; i++)
+        borde(YELLOW, B_HORIZONTAL);
+
+    borde(YELLOW, B_RIGHT_MIDDLE);
+    printf("\n");
+}
+
+/**
+ * Imprime un titulo de color amarillo y subrayado.
+ */
+void titulo_pantalla(const char* titulo)
+{
+    COLORIZE(YELLOW_UNDERLINE, titulo);
+    printf("\n");
+}
+
+/**
+ * Imprime un caracter de color verde para destacar y una descripcion de color amarillo.
+ */
+void mostrar_opcion(char opcion, const char* descripcion)
+{
+    borde_vertical();
+
+    char str[] = "  " TEXT_RESET " - ";
+    str[1] = opcion;
+    COLORIZE(GREEN, str);
+    texto(descripcion);
+    printf("\n");
+}
+
+/**
+ * Muestra en pantalla los archivos del directorio.
+ */
+void mostrar_archivos(char directorio[MAX_NOMBRE])
+{
+    DIR* dir = opendir(directorio);
+    if (!dir)
+    {
+        return;
+    }
+
+    borde_superior();
+    borde_vertical();
+    titulo_pantalla(directorio);
+
+    struct dirent *ent;
+    int i = 1;
+    while((ent = readdir(dir)))
+    {
+        if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
+        {
+            borde_vertical();
+            printf(ARCHIVO_FORMATO, ent->d_name);
+            if (i++ % 2 == 0)
+                printf("\n");
+        }
+    }
+    if (i % 2 == 0) borde_vertical();
+    closedir(dir);
+    printf("\n");
+    borde_medio();
 }
 
 /**
@@ -91,33 +219,8 @@ bool confirmacion(char opcion)
 }
 
 /**
- * Muestra en pantalla los archivos del directorio.
- */
-void mostrar_archivos(char directorio[MAX_NOMBRE])
-{
-    DIR* dir = opendir(directorio);
-    if (!dir)
-    {
-        return;
-    }
-
-    struct dirent *ent;
-    int i = 0;
-    while((ent = readdir(dir)))
-    {
-        if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
-        {
-            i++;
-            printf("|" ARCHIVO_FORMATO " |", ent->d_name);
-            if (i % 3 == 0) printf("\n");
-        }
-    }
-    closedir(dir);
-    printf("\n");
-}
-
-/**
- *
+ * Le pide al jugador ingresar un nombre. Después de confirmar, se crea su
+ * personaje y recibe un Pokémon.
  */
 void pantalla_crear_jugador(juego_t* juego)
 {
@@ -125,12 +228,18 @@ void pantalla_crear_jugador(juego_t* juego)
 
     do
     {
-        printf("| Cuál es su nombre?%s", PEDIR);
+        borde_vertical();
+        texto("Cuál es su nombre?\n");
+        printf(PEDIR);
         scanf(NOMBRE_FORMATO, nombre);
 
-        printf("| Su nombre es: %s ? (%c para confirmar / %c para cambiar)%s",
-                nombre, SI, NO, PEDIR
-                );
+        borde_vertical();
+        texto("Su nombre es: ");
+        COLORIZE(WHITE, nombre);
+        texto(" ?\n");
+        mostrar_opcion(SI, "Para confirmar");
+        mostrar_opcion(NO, "Para cambiar");
+        printf(PEDIR);
     }
     while (pedir_tecla(confirmacion) == NO);
 
@@ -138,7 +247,9 @@ void pantalla_crear_jugador(juego_t* juego)
 }
 
 /**
- *
+ * Muestra cuáles son los archivos de jugadores disponibles y le pide
+ * al usuario que ingrese cuál es el que desea cargar. Si no puede abrirlo,
+ * puede crear un nuevo personaje.
  */
 void pantalla_cargar_jugador(juego_t* juego)
 {
@@ -147,22 +258,28 @@ void pantalla_cargar_jugador(juego_t* juego)
 
     mostrar_archivos(ruta);
 
-    printf("| Cual es el archivo que desea cargar?: ");
+    borde_vertical();
+    texto("Cual es el archivo que desea cargar?:\n");
+    printf(PEDIR);
     scanf(ARCHIVO_FORMATO, archivo);
 
     if (cargar_jugador(strcat(ruta, archivo), juego) == ERROR)
     {
-        printf("| No se pudo abrir el archivo.\n");
-
-        printf("| Quiere crear una nueva partida? (%c para confirmar / %c para cancelar)\n"
-                , SI, NO);
-        
+        borde_vertical();
+        texto("No se pudo abrir el archivo.\n");
+        borde_medio();
+        borde_vertical();
+        texto("Querés crear una nueva partida?\n");
+        mostrar_opcion(SI, "Para confirmar");
+        mostrar_opcion(NO, "Para cancelar");
         if (pedir_tecla(confirmacion) == SI)
         {
             pantalla_crear_jugador(juego);
         }
     }
-    printf("| Ok!\n");
+    borde_medio();
+    borde_vertical();
+    texto("Ok!\n");
 }
 
 /**
@@ -170,26 +287,37 @@ void pantalla_cargar_jugador(juego_t* juego)
  */
 void pantalla_agregar_gimnasios(juego_t* juego)
 {
-    char ruta[MAX_RUTA] = ORIGEN_GIMNASIOS;
+    char ruta[MAX_RUTA];
     char archivo[MAX_ARCHIVO];
 
-    mostrar_archivos(ruta);
+    mostrar_archivos(ORIGEN_GIMNASIOS);
 
-    printf("| Cuales son los gimnasios que quiere cargar?: ");
+    borde_vertical();
+    texto("Cuales son los gimnasios que quiere cargar?\n");
+    printf(PEDIR);
     scanf(ARCHIVO_FORMATO, archivo);
 
     while (strcmp(archivo, SALIR))
     {
         strcpy(ruta, ORIGEN_GIMNASIOS);
+        borde_medio();
         if (cargar_gimnasios(strcat(ruta, archivo), juego) == ERROR)
         {
-            printf("| Parece que %s no es un archivo válido :(\n", archivo);
+            borde_vertical();
+            texto("Parece que ");
+            printf(archivo);
+            texto(" no es un archivo válido :(\n");
         }
         else
         {
-            printf("| Ok!\n");
+            borde_vertical();
+            texto("Ok!\n");
         }
-        printf("| Quiere cargar otro? (%s para salir): ", SALIR);
+        borde_medio();
+        borde_vertical();
+        texto("Querés cargar otro?\n");
+        mostrar_opcion(*SALIR, "Para salir");
+        printf(PEDIR);
         scanf(ARCHIVO_FORMATO, archivo);
     }
 }
@@ -197,9 +325,62 @@ void pantalla_agregar_gimnasios(juego_t* juego)
 /**
  *
  */
-void pantalla_partida(juego_t* juego)
+void mostrar_pokemon_party(pokemon_t* pokemon, void* contexto)
 {
-    printf("| Partida\n|\n|\n|\n");
+    if (!contexto) return;
+
+    borde_vertical();
+    char str[MAX_NOMBRE + 10],
+    formato[] = "%3i. %50s",
+    nombre[MAX_NOMBRE];
+    pokemon_nombre(pokemon, nombre);
+    (*(int*)contexto)++;
+    sprintf(str, formato, *(int*)contexto, nombre);
+    texto(strcat(str,"\n"));
+}
+
+/**
+ *
+ */
+void mostrar_pokemon_caja(pokemon_t* pokemon, void* contexto)
+{
+    if (!contexto || pokemon_en_party(pokemon))
+        return;
+
+    (*(int*)contexto)++;
+
+    borde_vertical();
+    char str[MAX_NOMBRE + 10],
+    formato[] = "%3i. %50s",
+    nombre[MAX_NOMBRE];
+    pokemon_nombre(pokemon, nombre);
+    sprintf(str, formato, *(int*)contexto, nombre);
+    texto(strcat(str,"\n"));
+}
+
+/**
+ * Imprime una fila de la table con información del Pokémon.
+ */
+void mostrar_pokemon_tabla(pokemon_t* pokemon, void* contexto)
+{
+    char nombre[MAX_NOMBRE];
+    pokemon_nombre(pokemon, nombre);
+    borde_vertical();
+    printf(YELLOW " %50s " B_VERTICAL "  %c " B_VERTICAL "  %c " B_VERTICAL " %3i " B_VERTICAL " %3i " B_VERTICAL " %3i\n" TEXT_RESET,
+            nombre, pokemon_tipo_principal(pokemon), pokemon_tipo_secundario(pokemon),
+            pokemon_ataque(pokemon), pokemon_defensa(pokemon), pokemon_velocidad(pokemon));
+}
+
+/**
+ *
+ */
+void tabla_pokemon(juego_t* juego, const char* titulo, entrenador_t* entrenador)
+{
+    borde_vertical();
+    titulo_pantalla(titulo);
+    borde_vertical();
+    printf(YELLOW " %50s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s " B_VERTICAL " %s\n" TEXT_RESET,
+            "Nombre", "T1", "T2", "Att", "Def", "Vel");
 }
 
 /**
@@ -207,7 +388,17 @@ void pantalla_partida(juego_t* juego)
  */
 void pantalla_equipo(juego_t* juego)
 {
-    printf("| Ver Equipo\n|\n|\n|\n");
+    tabla_pokemon(juego, "Mi equipo", personaje_principal(juego));
+    entrenador_mostrar_party(personaje_principal(juego), mostrar_pokemon_tabla, NULL);
+}
+
+/**
+ *
+ */
+void pantalla_obtenidos(juego_t* juego)
+{
+    tabla_pokemon(juego, "Mis Pokémon", personaje_principal(juego));
+    entrenador_mostrar_pokemon(personaje_principal(juego), mostrar_pokemon_tabla, NULL);
 }
 
 /**
@@ -215,7 +406,35 @@ void pantalla_equipo(juego_t* juego)
  */
 void pantalla_cambiar_equipo(juego_t* juego)
 {
-    printf("| Cambiar equipo\n|\n|\n|\n");
+    size_t contexto = 0, posicion;
+    borde_superior();
+    borde_vertical();
+    titulo_pantalla("Cambiar equipo");
+    entrenador_mostrar_party(personaje_principal(juego), mostrar_pokemon_party, &contexto);
+
+    borde_vertical();
+    texto("Qué Pokémon quiere sacar? (Ingrese nº)\n");
+    do
+    {
+        char str[10] = "";
+        printf(PEDIR);
+        scanf("%3s", str); // para prevenir overflow
+        posicion = (size_t) atoi(str);
+    }
+    while (quitar_del_party(juego, posicion - 1) == ERROR);
+
+    contexto--;
+    entrenador_mostrar_pokemon(personaje_principal(juego), mostrar_pokemon_caja, &contexto);
+    borde_vertical();
+    texto("Qué Pokémon quiere ingresar? (Ingrese nº)\n");
+    do
+    {
+        char str[4];
+        printf(PEDIR);
+        scanf("%3s", str); // para prevenir overflow
+        posicion = (size_t) atoi(str);
+    }
+    while (agregar_a_party(juego, posicion - 1));
 }
 
 /**
@@ -223,23 +442,43 @@ void pantalla_cambiar_equipo(juego_t* juego)
  */
 void pantalla_gimnasio(juego_t* juego)
 {
-    char str[MAX_NOMBRE];
+    char nombre[MAX_NOMBRE];
     gimnasio_t *gimnasio = gimnasio_actual(juego);
+    gimnasio_nombre(gimnasio, nombre);
 
-    gimnasio_nombre(gimnasio, str);
-    printf("|\n| Estas en el Gimnasio %s\n", str); 
-    printf("| Quedan %i entrenadores\n", (int) gimnasio_entrenadores(gimnasio));
+    borde_vertical();
+    texto("Estas en ");
+    printf("%s\n", nombre);
+    borde_vertical();
+    texto("Quedan ");
+    printf("%i", (int) gimnasio_entrenadores(gimnasio));
+    texto(" entrenadores\n");
+    borde_vertical();
+    texto("La función de batalla tiene id: ");
+    printf("%i\n", gimnasio_id_funcion(gimnasio));
+}
 
+void pantalla_rival(juego_t* juego)
+{
+    char nombre[MAX_NOMBRE];
     entrenador_t* rival = rival_actual(juego);
-    entrenador_nombre(rival, str);
-    printf("|\n| El próximo rival es %s\n", str);
-    pokemon_nombre(pokemon_enemigo(juego), str);
-    printf("| Cuenta con %i Pokémon. Su próximo Pokémon es %s\n"
-            , (int) entrenador_party(rival), str);
+
+    entrenador_nombre(rival, nombre);
+    borde_vertical();
+    texto("El próximo rival es ");
+    printf("%s\n", nombre);
+    borde_vertical();
+    texto("Cuenta con ");
+    printf("%i", (int) entrenador_party(rival));
+    texto(" Pokémon\n");
+
+    borde_medio();
+    tabla_pokemon(juego, "Su equipo", rival);
+    entrenador_mostrar_party(rival, mostrar_pokemon_tabla, NULL);
 }
 
 /**
- *
+ * Muestra información de la batalla actual.
  */
 void pantalla_batalla(juego_t* juego)
 {
@@ -250,39 +489,103 @@ void pantalla_batalla(juego_t* juego)
               *pkm_jugador = pokemon_jugador(juego);
 
     gimnasio_nombre(gimnasio, str);
-    printf("| Estas en el Gimnasio %s\n|\n|\n", str); 
+    borde_vertical();
+    texto("Estas en el Gimnasio ");
+    printf("%s\n", str);
 
     entrenador_nombre(rival, str);
-    printf("| Combates contra %s\n", str);
-    printf("| \n");
+    borde_vertical();
+    texto("Combates contra ");
+    printf("%s\n", str);
 
-    printf("| \n");
     pokemon_nombre(pkm_rival, str);
-    printf("| Oponente: %s\n", str);
+    borde_vertical();
+    texto("Pokémon enemigo: ");
+    printf("%s\n", str);
 
     pokemon_nombre(pkm_jugador, str);
-    printf("| Mi pkm: %s\n", str);
+    borde_vertical();
+    texto("Pokémon actual: ");
+    printf("%s\n", str);
+    borde_medio();
+    detener_tiempo(1);
 }
 
 /**
  *
  */
-void pantalla_victorias(juego_t* juego)
+void pantalla_simulacion(juego_t* juego)
 {
-    printf("| Victoria\n|\n|\n|\n");
+    if (!gimnasio_actual(juego))
+    {
+        COLORIZE(RED_BOLD, " No hay gimnasios cargados!\n");
+        menu_controller(I_INICIO, juego);
+        return;
+    }
+    if (!personaje_principal(juego))
+    {
+        COLORIZE(RED_BOLD, " No hay cargaste tu personaje!\n");
+        menu_controller(I_INICIO, juego);
+        return;
+    }
+
+    borde_superior();
+    borde_vertical();
+    titulo_pantalla("Simulación");
+    int resultado = retar_gimnasio(juego, pantalla_batalla);
+
+    while (resultado > 0)
+    {
+        borde_vertical();
+        texto("Has vencido el gimnasio!\n");
+        borde_medio();
+        resultado = retar_gimnasio(juego, pantalla_batalla);
+    }
+
+    if (!juego_gimnasios(juego))
+    {
+        borde_vertical();
+        texto("FELICIDADES! Has derrotado todos los gimnasios!\n");
+        borde_vertical();
+        texto("Recuerda combatir a la Elite Four para\n");
+        borde_vertical();
+        texto("convertirte en Maestro Pokémon!\n");
+    }
+    else
+    {
+        borde_vertical();
+        texto("Perdiste...\n");
+        borde_vertical();
+        texto("Todavía te falta madera para convertirte en Maestro Pokémon!\n");
+    }
+    borde_inferior();
 }
 
 /**
  *
  */
-void pantalla_derrotas(juego_t* juego)
-{
-    printf("| Derrotas\n|\n|\n|\n");
-}
-
 void pantalla_pedir_pokemon(juego_t* juego)
 {
-    printf("| Pedir pokemon\n|\n|\n|\n");
+    if (!gimnasio_derrotado(gimnasio_actual(juego)))
+    {
+        return;
+    }
+    char nombre[MAX_NOMBRE];
+    entrenador_nombre(rival_actual(juego), nombre);
+
+    size_t n = 0;
+    borde_superior();
+    borde_vertical();
+    titulo_pantalla("Toma un Pokémon de ");
+    printf("%s\n", nombre);
+    entrenador_mostrar_party(rival_actual(juego), mostrar_pokemon_party, &n);
+    do
+    {
+        char str[10] = "";
+        scanf("%3s", str); // para prevenir overflow
+        n = (size_t) atoi(str);
+    }
+    while (tomar_pokemon(juego, n));
 }
 
 /**
@@ -290,7 +593,32 @@ void pantalla_pedir_pokemon(juego_t* juego)
  */
 void pantalla_final(juego_t* juego)
 {
-    printf("| Fin\n|\n|\n|\n");
+    borde_superior();
+    borde_vertical();
+    texto("Es triste dejarte ir, pero espero que hayas disfrutado tu aventura\n");
+    borde_vertical();
+    texto("Querés guardar su partida?\n");
+    mostrar_opcion(SI, "Para confirmar");
+    mostrar_opcion(NO, "Para cancelar");
+    if (pedir_tecla(confirmacion) == SI)
+    {
+        borde_vertical();
+        texto("Ingrese un nombre para el archivo que desea guardar:\n");
+        char nombre[MAX_ARCHIVO];
+        printf(PEDIR);
+        scanf(ARCHIVO_FORMATO, nombre);
+        if (guardar_jugador(nombre, juego))
+        {
+            borde(RED, B_VERTICAL);
+            COLORIZE(RED_BOLD, "Ocurrió un error al guardar la partida\n");
+        }
+        else
+        {
+            borde_vertical();
+            texto("Espero que nos volvamos a ver pronto\n");
+        }
+    }
+    borde_inferior();
 }
 
 /**
@@ -313,23 +641,23 @@ bool menu_inicio_opcion_valido(char opcion)
 /**
  * Realiza una de las acciones del menu inicio.
  */
-void menu_inicio_accionar(char opcion, juego_t* juego)
+void menu_inicio_controller(char opcion, juego_t* juego)
 {
     switch (opcion)
     {
         case CARGAR_JUGADOR:
             pantalla_cargar_jugador(juego);
-            controller(I_INICIO, juego);
+            menu_controller(I_INICIO, juego);
             return;
         case AGREGAR_GIMNASIOS:
             pantalla_agregar_gimnasios(juego);
-            controller(I_INICIO, juego);
+            menu_controller(I_INICIO, juego);
             return;
         case COMENZAR_PARTIDA:
-            controller(I_GIMNASIO, juego);//, AVENTURA);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case SIMULAR_PARTIDA:
-            pantalla_partida(juego);//, SIMULACION);
+            pantalla_simulacion(juego);
             return;
     }
 }
@@ -339,21 +667,61 @@ void menu_inicio_accionar(char opcion, juego_t* juego)
  */
 void menu_inicio(juego_t* juego)
 {
-    char nombre[MAX_NOMBRE] = "",
-         str[MAX_NOMBRE + 4] = ", ";
+    char nombre[MAX_NOMBRE] = "";
     entrenador_nombre(personaje_principal(juego), nombre);
     int cargados = (int) juego_gimnasios(juego);
 
-    printf("|\n| Hola%s!\n", strcmp(nombre, "") ? strcat(str, nombre) : "" );
-    printf("| Hay %u gimnasio%s cargados\n", cargados, cargados == 1 ? "" : "s");
+    borde_superior();
+    borde_vertical();
+    texto("Hola");
+    texto(strcmp(nombre, "") ? ", " : "");
+    printf("%s", nombre);
+    texto("!\n");
 
-    printf("|\n| ¿Que desea hacer?\n");
-    printf("| %c - Cargar mi personaje\n", CARGAR_JUGADOR);
-    printf("| %c - Agregar gimnasios\n", AGREGAR_GIMNASIOS);
-    printf("| %c - Comenzar la partida\n", COMENZAR_PARTIDA);
-    printf("| %c - Simular la partida\n", SIMULAR_PARTIDA);
+    borde_vertical();
+    texto("Hay ");
+    printf("%i", (int) cargados);
+    texto(" gimnasios cargado");
+    texto(cargados == 1 ? "\n" : "s\n");
 
-    menu_inicio_accionar(pedir_tecla(menu_inicio_opcion_valido), juego);
+    borde_medio();
+    borde_vertical();
+    texto("¿Que desea hacer?\n");
+    borde_medio();
+    mostrar_opcion(CARGAR_JUGADOR, "Cargar mi personaje");
+    mostrar_opcion(AGREGAR_GIMNASIOS, "Agregar gimnasios");
+    mostrar_opcion(COMENZAR_PARTIDA, "Comenzar la partida");
+    mostrar_opcion(SIMULAR_PARTIDA, "Simular la partida");
+    menu_inicio_controller(pedir_tecla(menu_inicio_opcion_valido), juego);
+}
+
+/**
+ *
+ */
+bool menu_batalla_opcion_valido(char opcion)
+{
+    switch (opcion)
+    {
+        case SIGUIENTE:
+            return true;
+        default:
+            return false;
+    }
+}
+
+/**
+ *
+ */
+void menu_batalla(juego_t* juego)
+{
+    borde_superior();
+    pantalla_batalla(juego);
+    borde_vertical();
+    texto("¿Qué desea hacer?\n");
+    borde_medio();
+    mostrar_opcion(SIGUIENTE, "Pelear!");
+    pedir_tecla(menu_batalla_opcion_valido);
+    borde_inferior();
 }
 
 /**
@@ -391,27 +759,30 @@ bool menu_gimnasio_opcion_valido_extras(char opcion)
 /**
  *
  */
-void menu_gimnasio_accionar(char opcion, juego_t* juego)
+void menu_gimnasio_controller(char opcion, juego_t* juego)
 {
     switch(opcion)
     {
         case VER_EQUIPO:
+            borde_superior();
             pantalla_equipo(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case VER_GIMNASIO:
+            borde_superior();
             pantalla_gimnasio(juego);
+            pantalla_rival(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case CAMBIAR_EQUIPO:
             pantalla_cambiar_equipo(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case PELEAR:
-            pantalla_batalla(juego);
-            return;
-        case VER_VICTORIAS:
-            pantalla_victorias(juego);
-            return;
-        case VER_DERROTAS:
-            pantalla_derrotas(juego);
+            if (retar_gimnasio(juego, menu_batalla) > 0)
+                menu_controller(I_VICTORIA, juego);
+            else
+                menu_controller(I_DERROTA, juego);
             return;
     }
 }
@@ -421,67 +792,31 @@ void menu_gimnasio_accionar(char opcion, juego_t* juego)
  */
 void menu_gimnasio(juego_t* juego)
 {
+    if (!gimnasio_actual(juego))
+    {
+        COLORIZE(RED_BOLD, " No hay gimnasios cargados!\n");
+        menu_controller(I_INICIO, juego);
+        return;
+    }
+    if (!personaje_principal(juego))
+    {
+        COLORIZE(RED_BOLD, " No hay cargaste tu personaje!\n");
+        menu_controller(I_INICIO, juego);
+        return;
+    }
+
+    borde_superior();
     pantalla_gimnasio(juego);
 
-    printf("|\n| ¿Que desea hacer?\n");
-    printf("| %c - Ver mi equipo\n", VER_EQUIPO);
-    printf("| %c - Ver información del gimnasio actual\n", VER_GIMNASIO);
-    printf("| %c - Cambiar equipo\n", CAMBIAR_EQUIPO);
-    printf("| %c - Pelear!\n", PELEAR);
-
-    // if hay victorias, mostrar
-    printf("| %c - Mis victorias :D \n", VER_VICTORIAS);
-
-    // if hay derrotas, mostrar
-    printf("| %c - Mis derrotas :( \n", VER_DERROTAS);
-
-    menu_gimnasio_accionar(pedir_tecla(menu_gimnasio_opcion_valido), juego);
-}
-
-/**
- *
- */
-bool menu_batalla_opcion_valido(char opcion)
-{
-    switch (opcion)
-    {
-        case SIGUIENTE:
-            return true;
-        default:
-            return false;
-    }
-}
-
-/**
- *
- */
-void menu_batalla_accionar(char opcion, juego_t* juego)
-{
-    switch (opcion)
-    {
-        case SIGUIENTE:
-            pantalla_batalla(juego);
-            return;
-    }
-}
-
-/**
- *
- */
-void menu_batalla(juego_t* juego)
-{
-    pokemon_t *mi_pkm = pokemon_jugador(juego),
-              *otro_pkm = pokemon_enemigo(juego);
-    char nombre_1[MAX_NOMBRE], nombre_2[MAX_NOMBRE];
-
-    pokemon_nombre(mi_pkm, nombre_1);
-    pokemon_nombre(otro_pkm, nombre_2);
-    printf("| %s va a enfrentarse con %s\n", nombre_1, nombre_2);
-
-    printf("|\n| ¿Que desea hacer?\n");
-    printf("| %c - Pelear!\n", SIGUIENTE);
-
-    menu_batalla_accionar(pedir_tecla(menu_batalla_opcion_valido), juego);
+    borde_medio();
+    borde_vertical();
+    texto("¿Que desea hacer?\n");
+    borde_medio();
+    mostrar_opcion(VER_EQUIPO, "Ver mi equipo");
+    mostrar_opcion(VER_GIMNASIO, "Ver información del gimnasio actual");
+    mostrar_opcion(CAMBIAR_EQUIPO, "Cambiar equipo");
+    mostrar_opcion(PELEAR, "Pelear!");
+    menu_gimnasio_controller(pedir_tecla(menu_gimnasio_opcion_valido), juego);
 }
 
 /**
@@ -503,18 +838,20 @@ bool menu_victoria_opcion_valido(char opcion)
 /**
  *
  */
-void menu_victoria_accionar(char opcion, juego_t* juego)
+void menu_victoria_controller(char opcion, juego_t* juego)
 {
     switch (opcion)
     {
         case PEDIR_POKEMON:
             pantalla_pedir_pokemon(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case CAMBIAR_EQUIPO:
             pantalla_cambiar_equipo(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case PROXIMO_GIMNASIO:
-            pantalla_gimnasio(juego);
+            retar_gimnasio(juego, menu_gimnasio);
             return;
     }
 }
@@ -524,12 +861,19 @@ void menu_victoria_accionar(char opcion, juego_t* juego)
  */
 void menu_victoria(juego_t* juego)
 {
-    printf("|\n| ¿Que desea hacer?\n");
-    printf("| %c - Pedir Pokemon\n", PEDIR_POKEMON);
-    printf("| %c - Cambiar equipo\n", CAMBIAR_EQUIPO);
-    printf("| %c - Ir al próximo gimnasio\n", PROXIMO_GIMNASIO);
-
-    menu_victoria_accionar(pedir_tecla(menu_victoria_opcion_valido), juego);
+    borde_superior();
+    borde_vertical();
+    texto("Pudiste superar al líder :D\n");
+    borde_vertical();
+    texto("Podés pedirle prestado un Pokémon y prepararte para tu próxima aventura\n");
+    borde_medio();
+    borde_vertical();
+    texto("¿Qué desea hacer?\n");
+    borde_medio();
+    mostrar_opcion(PEDIR_POKEMON, "Pedir Pokémon");
+    mostrar_opcion(CAMBIAR_EQUIPO, "Cambiar equipo");
+    mostrar_opcion(PROXIMO_GIMNASIO, "Próximo gimnasio");
+    menu_victoria_controller(pedir_tecla(menu_victoria_opcion_valido), juego);
 }
 
 /**
@@ -551,17 +895,20 @@ bool menu_derrota_opcion_valido(char opcion)
 /**
  *
  */
-void menu_derrota_accionar(char opcion, juego_t* juego)
+void menu_derrota_controller(char opcion, juego_t* juego)
 {
     switch (opcion)
     {
         case CAMBIAR_EQUIPO:
             pantalla_cambiar_equipo(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case REINTENTAR_GIMNASIO:
             pantalla_gimnasio(juego);
+            menu_controller(I_GIMNASIO, juego);
             return;
         case FINALIZAR_PARTIDA:
+            borde_inferior();
             pantalla_final(juego);
             return;
     }
@@ -572,19 +919,26 @@ void menu_derrota_accionar(char opcion, juego_t* juego)
  */
 void menu_derrota(juego_t* juego)
 {
-    printf("|\n| ¿Que desea hacer?\n");
-    printf("| %c - Cambiar mi equipo\n", CAMBIAR_EQUIPO);
-    printf("| %c - Reintentar gimnasio\n", REINTENTAR_GIMNASIO);
-    printf("| %c - Finalizar partida\n", FINALIZAR_PARTIDA);
-
-    menu_derrota_accionar(pedir_tecla(menu_derrota_opcion_valido), juego);
+    borde_superior();
+    borde_vertical();
+    texto("Tu equipo no tiene más energía...\n");
+    borde_vertical();
+    texto("Parece que subestimaste la fuerza de este rival\n");
+    borde_medio();
+    borde_vertical();
+    texto("¿Qué desea hacer?\n");
+    borde_medio();
+    mostrar_opcion(CAMBIAR_EQUIPO, "Cambiar Pokémon");
+    mostrar_opcion(REINTENTAR_GIMNASIO, "Reintentar gimnasio");
+    mostrar_opcion(FINALIZAR_PARTIDA, "Finalizar partida");
+    menu_derrota_controller(pedir_tecla(menu_derrota_opcion_valido), juego);
 }
 
 /**
  * Recibe una instancia de juego creada y un numero i_menu que representa
  * el indice del menu que se desea mostrar.
  */
-void controller(int i_menu, juego_t* juego)
+void menu_controller(int i_menu, juego_t* juego)
 {
     void (*menus[])(juego_t*) = {
         menu_inicio,
@@ -594,5 +948,42 @@ void controller(int i_menu, juego_t* juego)
         menu_derrota
     };
 
+    borde_inferior();
+    detener_tiempo(1);
     menus[i_menu](juego);
+}
+
+/**
+ * Controller requerido por juego.h
+ */
+int funcion_batalla_controller(int id_funcion, pokemon_t* pokemon_1, pokemon_t* pokemon_2)
+{
+    if (id_funcion < 1 || id_funcion > 5)
+    {
+        return 0;
+    }
+
+    int (*funcion_batalla[])(void*, void*) = {
+        funcion_batalla_1,
+        funcion_batalla_2,
+        funcion_batalla_3,
+        funcion_batalla_4,
+        funcion_batalla_5
+    };
+
+    return funcion_batalla[id_funcion - 1](pokemon_1, pokemon_2);
+}
+
+int main(int argc,char** argv)
+{
+    juego_t* juego = juego_crear();
+
+    if (!juego)
+        return -1;
+
+    menu_inicio(juego);
+
+    juego_liberar(juego);
+
+    return 0;
 }

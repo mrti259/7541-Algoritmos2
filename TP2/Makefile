@@ -14,10 +14,11 @@ build:
 	@$(CC) $(CFLAGS) $(EXEC) $(CFILES)
 
 files:
-	@echo "Creando copiando algunos archivos de ejemplo..."
+	@echo "Generando algunos archivos de ejemplo..."
 	@mkdir -p datos/jugador datos/gimnasios
 	@cp docs/jugador/* datos/jugador/
 	@cp docs/gimnasios/* datos/gimnasios/
+	@sleep 1
 
 play:
 	@./$(EXEC)

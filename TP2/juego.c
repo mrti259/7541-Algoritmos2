@@ -112,6 +112,14 @@ void pokemon_nombre(pokemon_t* pokemon, char nombre[MAX_NOMBRE])
     strcpy(nombre, pokemon ? pokemon->nombre : "");
 }
 
+/**
+ * Definido en juego.h
+ */
+bool pokemon_en_party(pokemon_t* pokemon)
+{
+    return pokemon ? pokemon->en_party : false;
+}
+
 /*******************************************************************************
  * Entrenador
  ******************************************************************************/
@@ -286,12 +294,12 @@ int entrenador_agregar_pokemon(entrenador_t* entrenador, pokemon_t* pokemon)
  * Recorre una lista de Pokémon y las muestra. Los parámetros no pueden ser
  * NULL.
  */
-void entrenador_recorrer_pokemon(lista_t* pkm, void (*mostrar)(pokemon_t*))
+void entrenador_recorrer_pokemon(lista_t* pkm, void (*mostrar)(pokemon_t*, void*), void* contexto)
 {
     lista_iterador_t* iterador = lista_iterador_crear(pkm);
     while (lista_iterador_tiene_siguiente(iterador))
     {
-        mostrar(lista_iterador_elemento_actual(iterador));
+        mostrar(lista_iterador_elemento_actual(iterador), contexto);
         lista_iterador_avanzar(iterador);
     }
     lista_iterador_destruir(iterador);
@@ -300,27 +308,27 @@ void entrenador_recorrer_pokemon(lista_t* pkm, void (*mostrar)(pokemon_t*))
 /**
  * Definido en juego.h
  */
-void entrenador_mostrar_party(entrenador_t* entrenador, void (*mostrar)(pokemon_t*))
+void entrenador_mostrar_party(entrenador_t* entrenador, void (*mostrar)(pokemon_t*, void*), void* contexto)
 {
     if (!entrenador || !entrenador->pkm_party || !mostrar)
     {
         return;
     }
 
-    entrenador_recorrer_pokemon(entrenador->pkm_party, mostrar);
+    entrenador_recorrer_pokemon(entrenador->pkm_party, mostrar, contexto);
 }
 
 /**
  * Definido en juego.h
  */
-void entrenador_mostrar_pokemon(entrenador_t* entrenador, void (*mostrar)(pokemon_t*))
+void entrenador_mostrar_pokemon(entrenador_t* entrenador, void (*mostrar)(pokemon_t*, void*), void* contexto)
 {
     if (!entrenador || !mostrar || !entrenador->pkm_obtenidos)
     {
         return;
     }
 
-    entrenador_recorrer_pokemon(entrenador->pkm_obtenidos, mostrar);
+    entrenador_recorrer_pokemon(entrenador->pkm_obtenidos, mostrar, contexto);
 }
 
 /**
@@ -439,6 +447,14 @@ bool gimnasio_derrotado(gimnasio_t* gimnasio)
 void gimnasio_nombre(gimnasio_t* gimnasio, char nombre[MAX_NOMBRE])
 {
     strcpy(nombre, gimnasio ? gimnasio->nombre : "");
+}
+
+/**
+ * Definido en juego.h
+ */
+int gimnasio_id_funcion(gimnasio_t* gimnasio)
+{
+    return gimnasio ? gimnasio->id_funcion : -1;
 }
 
 /**

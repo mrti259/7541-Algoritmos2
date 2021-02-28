@@ -45,7 +45,8 @@ utilizadas por `juego.h` mediante un controlador, es decir, `juego.h` hace uso
 de un controlador externo que determinará cuáles son las funciones a utilizar.
 Este controlador se encuentra declarado en `juego.h` de la siguiente manera:
 
-```c extern int funcion_batalla_controller(int, void*, void*); ```
+```c
+extern int funcion_batalla_controller(int, void*, void*); ```
 
 Y su implementación se encuentra en `inicio.c`.
 

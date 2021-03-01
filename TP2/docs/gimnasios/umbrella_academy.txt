@@ -1,0 +1,9 @@
+G;Umbrella Academy;60;5
+L;Hargreeves
+P;Luther;L;L;140;60;30
+P;Allison;P;P;50;80;90
+P;Diego;S;S;60;80;100
+P;Klaus;F;F;30;50;90
+P;Five;P;V;40;90;200
+P;Ben;A;A;120;100;90
+P;Vanya;V;P;110;120;70

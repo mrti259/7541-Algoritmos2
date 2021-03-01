@@ -1,0 +1,28 @@
+G;Gimnasio de Ciudad Celeste; 25; 3
+L;Misty
+P;Staryu;A;A;20;40;50
+P;Starmie;A;A;30;50;60
+E;Dominguera Diana
+P;Goldeen;A;A;20;50;30
+E;Nadador Luis
+P;Horsea;A;A;25;30;20
+P;Shellder;A;A;20;20;45
+G;Gimnasio de Ciudad Celeste; 35; 3
+L;Misty
+P;Staryu;A;A;50;40;50
+P;Starmie;A;A;90;50;60
+E;Dominguera Diana
+P;Goldeen;A;A;40;50;30
+E;Nadador Luis
+P;Horsea;A;A;45;30;20
+P;Shellder;A;A;30;20;45
+G;Gimnasio de Ciudad Celeste; 45; 3
+L;Misty
+P;Staryu;A;A;80;90;74
+P;Starmie;A;A;90;70;80
+E;Dominguera Diana
+P;Goldeen;A;A;70;59;60
+E;Nadador Luis
+P;Horsea;A;A;65;60;80
+P;Shellder;A;A;60;70;45
+

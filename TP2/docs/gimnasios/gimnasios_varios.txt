@@ -1,0 +1,35 @@
+G;Gimnasio de Ciudad Carmín;30;1
+L;Lt. Surge
+P;Voltorb;E;E;30;35;50
+P;Pikachu;E;E;50;40;70
+P;Raichu;E;E;60;50;70
+E;Marinero Dimas
+P;Pikachu;E;E;30;40;44
+P;Pikachu;E;E;35;40;44
+E;Mecanico Manolo
+P;Voltorb;E;E;30;33;40
+P;Magnamite;E;I;25;36;36
+E;Caballero Tito
+P;Pikachu;E;E;20;25;30
+
+G;Gimnasio de Ciudad Verde;50;3
+L;Giovanni
+P;Rhyhorn;S;R;70;66;55
+P;Dugtrio;T;S;70;50;60
+P;Nidoking;T;S;90;70;60
+P;Nidoqueen;T;S;80;70;70
+P;Rhyhorn;S;R;90;80;80
+E;Entrenador Guay Yuji
+P;Sandlash;S;S;60;80;70
+P;Graveler;S;S;60;70;50
+P;Onix;S;S;57;80;60
+P;Graveler;S;S;67;57;46
+P;Marowak;S;S;70;50;50
+
+G;Gimnasio de Ciudad Plateada;4;2
+L;Brock
+P;Geodude;R;S;10;11;10
+P;Onix;R;S;12;11;11
+E;Campista Angelito
+P;Geodude;R;S;6;8;8
+P;Sandshrew;R;S;8;10;10

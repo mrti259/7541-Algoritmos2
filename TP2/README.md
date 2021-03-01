@@ -151,3 +151,21 @@ El juego siempre conoce quién es el personaje principal, cuál es el Pokémon c
 el que combatirá, quién es su próximo contricante y qué Pokémon utilizará.
 Obviamente, también conoce cuál es el gimnasio en el que se encuentra y si este
 fue derrotado o aún no.
+
+## Pruebas
+
+El archivo `make` incluye otras reglas que permiten realizar pruebas.
+
+- `make test` ejecuta el juego bajo la herramienta valgrind que permite detectar
+accesos incorrectos a la memoria y/o pérdidas.
+
+- `make test_juego` ejecuta pruebas unitarias de la mayoría de las funciones de
+juego.c. Estas pruebas son de caja blanca y también hace uso de valgrind.
+
+- `make test_heap` ejecuta pruebas unitarias de las funciones de heap.
+
+- `make test_abb` ejecuta pruebas unitarias de las funciones de abb.
+
+- `make test_lista` ejecuta pruebas unitarias de las funciones de lista.
+
+- `make lint` hace uso de `cppcheck` para analizar el código.

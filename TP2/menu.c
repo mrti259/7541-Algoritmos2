@@ -733,6 +733,11 @@ void menu_inicio_controller(char opcion, juego_t* juego)
  */
 void menu_inicio(juego_t* juego)
 {
+    if (!juego)
+    {
+        COLORIZE(RED_BOLD, " Necesitas reservar memoria para el juego antes de empezar");
+    }
+
     entrenador_t* personaje = personaje_principal(juego);
     char nombre[MAX_NOMBRE];
     entrenador_nombre(personaje, nombre);
@@ -757,8 +762,7 @@ void menu_inicio(juego_t* juego)
     borde_vertical();
     texto("Hay ");
     printf("%i", gim_cargados);
-    texto(" gimnasios cargado");
-    texto(gim_cargados == 1 ? "\n" : "s\n");
+    texto(gim_cargados == 1 ? " gimnasio cargado\n" : " gimnasios cargados\n");
 
     borde_medio();
     borde_vertical();

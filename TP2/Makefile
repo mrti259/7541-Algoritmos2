@@ -44,7 +44,7 @@ test_lista:
 
 
 lint:
-	cppcheck --enable=all *.c
+	cppcheck --enable=all *.c */*.c
 
 clean:
 	rm *.bin */*.bin *.tmp */*.tmp

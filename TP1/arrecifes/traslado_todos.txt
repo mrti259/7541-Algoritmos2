@@ -1,0 +1,11 @@
+Magikarp;32;15;dorado
+Magikarp;32;15;rojo
+Magikarp;76;16;rojo
+Tentacool;56;12;azul
+Magikarp;13;10;rojo
+Magikarp;13;10;rojo
+Magikarp;13;10;rojo
+Pikachu;23;54;amarillo
+Magikarp;13;10;rojo
+Articuno;300;345;azul
+Mewtwo;900;900;blanco
